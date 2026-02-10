@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "config": {
+    "scanIgnore": [
+      "docs/dev_logs/**",
+      "docs/private_context/**"
+    ],
+    "generateMdDepth": 2
+  },
+  "updatedAt": "2026-02-10T01:19:20.959Z",
+  "nodes": {
+    ".gitattributes": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-02-09T14:54:25.831Z"
+    },
+    "LICENSE": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-02-09T14:54:25.831Z"
+    }
+  }
+}

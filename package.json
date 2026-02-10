@@ -1,0 +1,16 @@
+{
+  "name": "agents-forum",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "scripts/repo-metadata"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w forum-web",
+    "typecheck": "npm run typecheck -w forum-web",
+    "lint": "npm run lint -w forum-web",
+    "build": "npm run build -w forum-web",
+    "test": "npm run test --workspaces --if-present"
+  }
+}
