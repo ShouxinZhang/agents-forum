@@ -7,23 +7,1087 @@
     ],
     "generateMdDepth": 2
   },
-  "updatedAt": "2026-02-10T01:19:20.959Z",
+  "updatedAt": "2026-02-10T03:03:57.632Z",
   "nodes": {
     ".gitattributes": {
       "type": "file",
-      "description": "",
+      "description": "Git 属性配置。",
       "detail": "",
       "tags": [],
-      "updatedBy": "scan",
-      "updatedAt": "2026-02-09T14:54:25.831Z"
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    ".gitignore": {
+      "type": "file",
+      "description": "Git 忽略规则。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "AGENTS.md": {
+      "type": "file",
+      "description": "仓库级 Agent 执行规范与约束。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
     },
     "LICENSE": {
       "type": "file",
-      "description": "",
+      "description": "项目许可证文件。",
       "detail": "",
       "tags": [],
-      "updatedBy": "scan",
-      "updatedAt": "2026-02-09T14:54:25.831Z"
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps": {
+      "type": "directory",
+      "description": "应用工作区目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web": {
+      "type": "directory",
+      "description": "论坛前端应用（Vite + React + TS）。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/.gitignore": {
+      "type": "file",
+      "description": "文件：.gitignore",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/README.md": {
+      "type": "file",
+      "description": "文档文件：README.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/components.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：components.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/eslint.config.js": {
+      "type": "file",
+      "description": "JavaScript 文件：eslint.config.js",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/index.html": {
+      "type": "file",
+      "description": "HTML 文件：index.html",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/package-lock.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：package-lock.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/package.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：package.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/public": {
+      "type": "directory",
+      "description": "目录：public",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/public/vite.svg": {
+      "type": "file",
+      "description": "SVG 资源文件：vite.svg",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src": {
+      "type": "directory",
+      "description": "前端业务与组件源码目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/App.css": {
+      "type": "file",
+      "description": "样式文件：App.css",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/App.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：App.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/assets": {
+      "type": "directory",
+      "description": "目录：assets",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/assets/react.svg": {
+      "type": "file",
+      "description": "SVG 资源文件：react.svg",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components": {
+      "type": "directory",
+      "description": "前端组件目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui": {
+      "type": "directory",
+      "description": "基础 UI 组件目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui/avatar.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：avatar.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui/badge.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：badge.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui/button.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：button.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui/card.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：card.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui/input.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：input.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui/separator.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：separator.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui/sheet.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：sheet.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/components/ui/textarea.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：textarea.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/index.css": {
+      "type": "file",
+      "description": "样式文件：index.css",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/lib": {
+      "type": "directory",
+      "description": "前端公共工具与本地状态工具。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/lib/auth-storage.ts": {
+      "type": "file",
+      "description": "TypeScript 文件：auth-storage.ts",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/lib/utils.ts": {
+      "type": "file",
+      "description": "TypeScript 文件：utils.ts",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/src/main.tsx": {
+      "type": "file",
+      "description": "React TypeScript 组件：main.tsx",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/tsconfig.app.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：tsconfig.app.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/tsconfig.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：tsconfig.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/tsconfig.node.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：tsconfig.node.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-web/vite.config.ts": {
+      "type": "file",
+      "description": "TypeScript 文件：vite.config.ts",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs": {
+      "type": "directory",
+      "description": "项目文档目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/architecture": {
+      "type": "directory",
+      "description": "架构与仓库结构文档。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/architecture/repo-metadata.json": {
+      "type": "file",
+      "description": "仓库路径元数据主文件（JSON source of truth）。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/architecture/repository-structure.md": {
+      "type": "file",
+      "description": "仓库结构树展示文档。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/dev_logs": {
+      "type": "directory",
+      "description": "开发过程日志目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/dev_plan": {
+      "type": "directory",
+      "description": "产品与研发计划文档目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/dev_plan/agents_forum_mvp_plan.md": {
+      "type": "file",
+      "description": "Agents Forum MVP 分阶段计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/dev_plan/image": {
+      "type": "directory",
+      "description": "目录：image",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/dev_plan/image/agents_forum_mvp_plan": {
+      "type": "directory",
+      "description": "目录：agents_forum_mvp_plan",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/dev_plan/image/agents_forum_mvp_plan/1770651084283.png": {
+      "type": "file",
+      "description": "PNG 图片资源：1770651084283.png",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "package-lock.json": {
+      "type": "file",
+      "description": "Monorepo 根依赖锁文件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "package.json": {
+      "type": "file",
+      "description": "Monorepo 根工作区配置与脚本入口。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "restart.sh": {
+      "type": "file",
+      "description": "本地一键重启脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts": {
+      "type": "directory",
+      "description": "自动化脚本目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/check_errors.sh": {
+      "type": "file",
+      "description": "通用质量门禁脚本（typecheck/lint/build）。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-map": {
+      "type": "directory",
+      "description": "Repo metadata 思维导图通用工具目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/README.md": {
+      "type": "file",
+      "description": "repo-map 工具使用说明。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/package.json": {
+      "type": "file",
+      "description": "repo-map 工具包配置。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/run.sh": {
+      "type": "file",
+      "description": "repo-map 一键启动脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/src": {
+      "type": "directory",
+      "description": "repo-map 后端源码目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/src/lib": {
+      "type": "directory",
+      "description": "repo-map 后端公共库目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/src/lib/consistency-check.mjs": {
+      "type": "file",
+      "description": "repo-map SQLite/JSON 一致性比较逻辑。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/src/lib/db.mjs": {
+      "type": "file",
+      "description": "repo-map 数据库连接、路径解析与基础工具。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/src/lib/metadata-store.mjs": {
+      "type": "file",
+      "description": "repo-map 元数据读取、CRUD、布局与同步实现。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/src/server.mjs": {
+      "type": "file",
+      "description": "repo-map HTTP 服务入口与 API 路由。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web": {
+      "type": "directory",
+      "description": "repo-map 前端页面目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web/components": {
+      "type": "directory",
+      "description": "repo-map 前端组件目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web/components/MapCanvas.tsx": {
+      "type": "file",
+      "description": "基于 React Flow 的思维导图画布组件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web/components/NodeEditor.tsx": {
+      "type": "file",
+      "description": "节点编辑与 CRUD 操作面板组件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web/components/SqlPanel.tsx": {
+      "type": "file",
+      "description": "SQL 模板展示与复制组件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web/components/Toolbar.tsx": {
+      "type": "file",
+      "description": "工具栏与一致性告警组件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web/index.html": {
+      "type": "file",
+      "description": "repo-map 前端入口页面与样式。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web/main.tsx": {
+      "type": "file",
+      "description": "repo-map 前端主逻辑（数据加载与交互编排）。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-map/web/types.ts": {
+      "type": "file",
+      "description": "repo-map 前端公共类型与工具函数。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-metadata": {
+      "type": "directory",
+      "description": "仓库元数据工具集。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/README.md": {
+      "type": "file",
+      "description": "repo-metadata 使用说明。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/lib": {
+      "type": "directory",
+      "description": "repo-metadata 公共库目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/lib/shared.mjs": {
+      "type": "file",
+      "description": "repo-metadata 通用文件系统与文档生成工具。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/lib/sqlite.mjs": {
+      "type": "file",
+      "description": "repo-metadata 的 SQLite 连接与序列化工具。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-metadata/mcp-server.mjs": {
+      "type": "file",
+      "description": "repo-metadata MCP Server（含 JSON⇄SQLite 同步工具）。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/package-lock.json": {
+      "type": "file",
+      "description": "repo-metadata 工具包锁文件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/package.json": {
+      "type": "file",
+      "description": "repo-metadata 工具包配置。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/scripts": {
+      "type": "directory",
+      "description": "repo-metadata CLI 脚本目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/scripts/crud.mjs": {
+      "type": "file",
+      "description": "repo-metadata 的增删改查命令行工具。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/scripts/generate-structure-md.mjs": {
+      "type": "file",
+      "description": "从元数据生成仓库目录树文档。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/scripts/scan.mjs": {
+      "type": "file",
+      "description": "扫描 Git 跟踪路径并更新元数据。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/scripts/sync-json-to-postgres.mjs": {
+      "type": "file",
+      "description": "兼容入口：转发到 SQLite 的 JSON→DB 同步脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/scripts/sync-json-to-sqlite.mjs": {
+      "type": "file",
+      "description": "将 repo-metadata.json 全量同步到 SQLite。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T03:03:57.632Z"
+    },
+    "scripts/repo-metadata/scripts/sync-to-json.mjs": {
+      "type": "file",
+      "description": "将 SQLite 元数据回写到 repo-metadata.json。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/sql": {
+      "type": "directory",
+      "description": "repo-metadata 数据库初始化脚本目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/repo-metadata/sql/001_init.sql": {
+      "type": "file",
+      "description": "repo-metadata SQLite 初始化脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review": {
+      "type": "directory",
+      "description": "代码评审自动化脚本目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/README.md": {
+      "type": "file",
+      "description": "文档文件：README.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/config": {
+      "type": "directory",
+      "description": "目录：config",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/config/policy.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：policy.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/input": {
+      "type": "directory",
+      "description": "目录：input",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/input/.gitkeep": {
+      "type": "file",
+      "description": "文件：.gitkeep",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/mcp-server.mjs": {
+      "type": "file",
+      "description": "Node.js 脚本：mcp-server.mjs",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/run.sh": {
+      "type": "file",
+      "description": "Shell 脚本：run.sh",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/scripts": {
+      "type": "directory",
+      "description": "目录：scripts",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/scripts/collect-context.mjs": {
+      "type": "file",
+      "description": "Node.js 脚本：collect-context.mjs",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/scripts/dependency-gate.mjs": {
+      "type": "file",
+      "description": "Node.js 脚本：dependency-gate.mjs",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/scripts/run-review.mjs": {
+      "type": "file",
+      "description": "Node.js 脚本：run-review.mjs",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/scripts/validate-llm-report.mjs": {
+      "type": "file",
+      "description": "Node.js 脚本：validate-llm-report.mjs",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/templates": {
+      "type": "directory",
+      "description": "目录：templates",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/review/templates/llm-review.template.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：llm-review.template.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills": {
+      "type": "directory",
+      "description": "本仓库可复用技能目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/build-check": {
+      "type": "directory",
+      "description": "目录：build-check",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/build-check/SKILL.md": {
+      "type": "file",
+      "description": "文档文件：SKILL.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dependency-review-system": {
+      "type": "directory",
+      "description": "目录：dependency-review-system",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dependency-review-system/SKILL.md": {
+      "type": "file",
+      "description": "文档文件：SKILL.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dependency-review-system/subskills": {
+      "type": "directory",
+      "description": "目录：subskills",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dependency-review-system/subskills/collect-context.md": {
+      "type": "file",
+      "description": "文档文件：collect-context.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dependency-review-system/subskills/decision-gate.md": {
+      "type": "file",
+      "description": "文档文件：decision-gate.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dependency-review-system/subskills/dependency-guard.md": {
+      "type": "file",
+      "description": "文档文件：dependency-guard.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dependency-review-system/subskills/risk-analyzer.md": {
+      "type": "file",
+      "description": "文档文件：risk-analyzer.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dependency-review-system/subskills/test-gap-mapper.md": {
+      "type": "file",
+      "description": "文档文件：test-gap-mapper.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dev-logs": {
+      "type": "directory",
+      "description": "目录：dev-logs",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/dev-logs/SKILL.md": {
+      "type": "file",
+      "description": "文档文件：SKILL.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/domain-data-update": {
+      "type": "directory",
+      "description": "目录：domain-data-update",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/domain-data-update/SKILL.md": {
+      "type": "file",
+      "description": "文档文件：SKILL.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/git-management": {
+      "type": "directory",
+      "description": "目录：git-management",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/git-management/SKILL.md": {
+      "type": "file",
+      "description": "文档文件：SKILL.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/local-dev-workflow": {
+      "type": "directory",
+      "description": "目录：local-dev-workflow",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/local-dev-workflow/SKILL.md": {
+      "type": "file",
+      "description": "文档文件：SKILL.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance": {
+      "type": "directory",
+      "description": "目录：modularization-governance",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance/SKILL.md": {
+      "type": "file",
+      "description": "文档文件：SKILL.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance/references": {
+      "type": "directory",
+      "description": "目录：references",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance/references/modularity-policy.template.json": {
+      "type": "file",
+      "description": "JSON 配置/数据文件：modularity-policy.template.json",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance/references/refactor-playbook.md": {
+      "type": "file",
+      "description": "文档文件：refactor-playbook.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance/references/scorecard.md": {
+      "type": "file",
+      "description": "文档文件：scorecard.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance/scripts": {
+      "type": "directory",
+      "description": "目录：scripts",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance/scripts/check-modularity.mjs": {
+      "type": "file",
+      "description": "Node.js 脚本：check-modularity.mjs",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/modularization-governance/scripts/check-unused-symbols.mjs": {
+      "type": "file",
+      "description": "Node.js 脚本：check-unused-symbols.mjs",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/repo-structure-sync": {
+      "type": "directory",
+      "description": "目录：repo-structure-sync",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/repo-structure-sync/SKILL.md": {
+      "type": "file",
+      "description": "文档文件：SKILL.md",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-02-10T02:27:29.628Z"
     }
   }
 }

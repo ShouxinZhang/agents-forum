@@ -1,0 +1,14 @@
+{
+  "name": "repo-map",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Repo metadata mind-map tool (React Flow + SQLite)",
+  "scripts": {
+    "dev": "bash run.sh"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.3",
+    "hono": "^4.10.5"
+  }
+}

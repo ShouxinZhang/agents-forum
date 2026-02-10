@@ -2,7 +2,7 @@
 /**
  * repo-metadata MCP Server
  *
- * 提供仓库元数据 CRUD、扫描、生成架构文档、PG 同步等 MCP Tools，
+ * 提供仓库元数据 CRUD、扫描、生成架构文档、SQLite 同步等 MCP Tools，
  * 供 LLM 直接调用，无需拼终端命令。
  *
  * 传输方式: stdio（VS Code Copilot 标准集成）
@@ -24,6 +24,13 @@ import {
   shouldIgnore,
   updateStructureMd,
 } from './lib/shared.mjs';
+import {
+  deserializeTags,
+  ensureRepoMetadataSchema,
+  openSqliteDb,
+  resolveSqlitePath,
+  serializeTags,
+} from './lib/sqlite.mjs';
 
 /* ------------------------------------------------------------------ */
 /*  路径常量                                                           */
@@ -34,20 +41,7 @@ const repoRoot = path.resolve(scriptDir, '../../');
 const metadataPath = path.join(repoRoot, 'docs', 'architecture', 'repo-metadata.json');
 const structureMdPath = path.join(repoRoot, 'docs', 'architecture', 'repository-structure.md');
 
-/* ------------------------------------------------------------------ */
-/*  PG 同步辅助（动态 import pg，仅在需要时）                          */
-/* ------------------------------------------------------------------ */
-
-async function getPgClient() {
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error('缺少 DATABASE_URL 环境变量，无法执行 PG 同步。');
-  }
-  const { Client } = await import('pg');
-  const client = new Client({ connectionString: databaseUrl });
-  await client.connect();
-  return client;
-}
+const sqlitePath = resolveSqlitePath(repoRoot);
 
 /* ------------------------------------------------------------------ */
 /*  MCP Server 定义                                                    */
@@ -353,15 +347,26 @@ server.tool(
 
 server.tool(
   'repo_metadata_sync_db',
-  'JSON ⇄ PostgreSQL 双向同步。需要 DATABASE_URL 环境变量。',
+  'JSON ⇄ SQLite 双向同步。可通过 REPO_METADATA_DB_PATH/SQLITE_PATH 指定数据库路径。',
   {
-    direction: z.enum(['json-to-pg', 'pg-to-json']).describe('"json-to-pg" 或 "pg-to-json"'),
+    direction: z
+      .enum(['json-to-sqlite', 'sqlite-to-json', 'json-to-pg', 'pg-to-json'])
+      .describe('"json-to-sqlite" 或 "sqlite-to-json"（兼容旧值: json-to-pg/pg-to-json）'),
   },
   async ({ direction }) => {
-    const client = await getPgClient();
+    const normalizedDirection =
+      direction === 'json-to-pg'
+        ? 'json-to-sqlite'
+        : direction === 'pg-to-json'
+          ? 'sqlite-to-json'
+          : direction;
+
+    const db = await openSqliteDb(sqlitePath);
 
     try {
-      if (direction === 'json-to-pg') {
+      ensureRepoMetadataSchema(db);
+
+      if (normalizedDirection === 'json-to-sqlite') {
         const metadata = await loadMetadata(metadataPath);
         const entries = Object.entries(metadata.nodes);
 
@@ -369,71 +374,85 @@ server.tool(
           return { content: [{ type: 'text', text: 'ℹ repo-metadata.json 为空。' }] };
         }
 
-        await client.query('begin');
+        db.exec('begin immediate;');
 
         const sorted = entries.sort(([a], [b]) => {
           return a.split('/').length - b.split('/').length || a.localeCompare(b);
         });
 
+        const upsertStmt = db.prepare(`
+          insert into repo_metadata_nodes (path, type, description, detail, tags, parent_path, sort_order, updated_by, updated_at)
+          values (@path, @type, @description, @detail, @tags, @parent_path, @sort_order, @updated_by, @updated_at)
+          on conflict (path) do update set
+            type = excluded.type,
+            description = excluded.description,
+            detail = excluded.detail,
+            tags = excluded.tags,
+            parent_path = excluded.parent_path,
+            sort_order = excluded.sort_order,
+            updated_by = excluded.updated_by,
+            updated_at = excluded.updated_at
+        `);
+
+        const now = new Date().toISOString();
         let upserted = 0;
         for (const [nodePath, node] of sorted) {
           const parentPath = path.dirname(nodePath);
-          await client.query(
-            `insert into repo_metadata_nodes (path, type, description, detail, tags, parent_path, sort_order, updated_by)
-             values ($1, $2, $3, $4, $5, $6, $7, $8)
-             on conflict (path) do update set
-               type=excluded.type, description=excluded.description, detail=excluded.detail,
-               tags=excluded.tags, parent_path=excluded.parent_path, sort_order=excluded.sort_order,
-               updated_by=excluded.updated_by`,
-            [
-              nodePath,
-              node.type,
-              node.description || null,
-              node.detail || null,
-              node.tags ?? [],
-              parentPath === '.' ? null : parentPath,
-              node.sortOrder ?? 0,
-              node.updatedBy ?? 'scan',
-            ],
-          );
+          upsertStmt.run({
+            path: nodePath,
+            type: node.type,
+            description: node.description || null,
+            detail: node.detail || null,
+            tags: serializeTags(node.tags),
+            parent_path: parentPath === '.' ? null : parentPath,
+            sort_order: node.sortOrder ?? 0,
+            updated_by: node.updatedBy ?? 'scan',
+            updated_at: node.updatedAt ?? now,
+          });
           upserted++;
         }
 
         const pathSet = new Set(entries.map(([p]) => p));
-        const dbRows = await client.query('select path from repo_metadata_nodes');
+        const dbRows = db.prepare('select path from repo_metadata_nodes').all();
+        const deleteStmt = db.prepare('delete from repo_metadata_nodes where path = ?');
         let deleted = 0;
-        for (const row of dbRows.rows) {
+        for (const row of dbRows) {
           if (!pathSet.has(row.path)) {
-            await client.query('delete from repo_metadata_nodes where path = $1', [row.path]);
+            deleteStmt.run(row.path);
             deleted++;
           }
         }
 
-        await client.query('commit');
+        db.exec('commit;');
         return {
-          content: [{ type: 'text', text: `✅ JSON → PG 同步完成: upsert ${upserted}, 删除 ${deleted}` }],
+          content: [
+            {
+              type: 'text',
+              text: `✅ JSON → SQLite 同步完成: upsert ${upserted}, 删除 ${deleted}\n📦 ${sqlitePath}`,
+            },
+          ],
         };
       } else {
-        // pg-to-json
-        const result = await client.query(`
+        // sqlite-to-json
+        const rows = db.prepare(`
           select path, type, description, detail, tags, sort_order, updated_by, updated_at
           from repo_metadata_nodes order by path
-        `);
+        `).all();
 
-        if (result.rows.length === 0) {
-          return { content: [{ type: 'text', text: 'ℹ PG 表为空。' }] };
+        if (rows.length === 0) {
+          return { content: [{ type: 'text', text: 'ℹ SQLite 表为空。' }] };
         }
 
         const metadata = await loadMetadata(metadataPath);
         const nodes = {};
-        for (const row of result.rows) {
+        for (const row of rows) {
           nodes[row.path] = {
             type: row.type,
             description: row.description ?? '',
             detail: row.detail ?? '',
-            tags: row.tags ?? [],
+            tags: deserializeTags(row.tags),
             updatedBy: row.updated_by ?? 'scan',
-            updatedAt: row.updated_at?.toISOString() ?? new Date().toISOString(),
+            updatedAt: row.updated_at ?? new Date().toISOString(),
           };
         }
 
@@ -441,14 +460,23 @@ server.tool(
         await saveMetadata(metadataPath, metadata);
 
         return {
-          content: [{ type: 'text', text: `✅ PG → JSON 同步完成: ${result.rows.length} 条记录` }],
+          content: [
+            {
+              type: 'text',
+              text: `✅ SQLite → JSON 同步完成: ${rows.length} 条记录\n📦 ${sqlitePath}`,
+            },
+          ],
         };
       }
     } catch (err) {
-      await client.query('rollback').catch(() => {});
+      try {
+        db.exec('rollback;');
+      } catch {
+        // ignore rollback error
+      }
       throw err;
     } finally {
-      await client.end();
+      db.close();
     }
   },
 );

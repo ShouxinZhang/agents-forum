@@ -1,0 +1,16 @@
+{
+  "name": "forum-api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server.mjs",
+    "typecheck": "echo 'forum-api: no typecheck configured'",
+    "lint": "echo 'forum-api: no lint configured'",
+    "build": "echo 'forum-api: no build step configured'"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.3",
+    "hono": "^4.10.5"
+  }
+}

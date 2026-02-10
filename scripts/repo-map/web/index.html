@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repo Metadata Mind Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/@xyflow/react@12.8.6/dist/style.css" />
+    <style>
+      :root {
+        --bg: #f7f8f4;
+        --panel: #ffffff;
+        --line: #d8ddcf;
+        --text: #1d2a1f;
+        --muted: #61735f;
+        --brand: #2a835e;
+        --brand-soft: #e6f4ed;
+        --warn: #b15b1f;
+        --warn-bg: #fff3e7;
+        --ok: #256f4b;
+        --ok-bg: #e8f7ef;
+        --danger: #a9302a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        font-family: 'Avenir Next', 'Nunito', 'Noto Sans SC', sans-serif;
+        background:
+          radial-gradient(circle at 8% 10%, rgba(115, 205, 141, 0.22), transparent 35%),
+          radial-gradient(circle at 92% 0%, rgba(248, 192, 119, 0.25), transparent 33%),
+          linear-gradient(145deg, #f9fbf6 0%, #f2f8f3 46%, #f8f4ea 100%);
+      }
+
+      .app-shell {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(8px);
+        padding: 14px;
+      }
+
+      .toolbar-left {
+        min-width: 0;
+      }
+
+      .toolbar-title {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .toolbar-subtitle {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .toolbar-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .segmented {
+        display: inline-flex;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .segmented button {
+        border: none;
+        border-right: 1px solid var(--line);
+        background: #fff;
+        padding: 8px 10px;
+      }
+
+      .segmented button:last-child {
+        border-right: none;
+      }
+
+      .segmented .segmented-active {
+        background: var(--brand-soft);
+        color: var(--ok);
+        font-weight: 700;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 10px;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.52;
+        cursor: not-allowed;
+      }
+
+      .consistency-banner {
+        grid-column: 1 / -1;
+        border-radius: 12px;
+        padding: 9px 11px;
+        font-size: 13px;
+      }
+
+      .expand-stats {
+        grid-column: 1 / -1;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .consistency-banner.ok {
+        background: var(--ok-bg);
+        color: var(--ok);
+        border: 1px solid #b7e0c9;
+      }
+
+      .consistency-banner.warn {
+        background: var(--warn-bg);
+        color: var(--warn);
+        border: 1px solid #f0d2b9;
+      }
+
+      .flash {
+        border-radius: 12px;
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+
+      .flash.success {
+        background: var(--ok-bg);
+        color: var(--ok);
+        border: 1px solid #b7e0c9;
+      }
+
+      .flash.error {
+        background: #ffefee;
+        color: var(--danger);
+        border: 1px solid #f2c7c3;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 12px;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .map-canvas {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.86);
+        min-height: 72vh;
+        overflow: hidden;
+      }
+
+      .side-column {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 0;
+      }
+
+      .node-editor,
+      .sql-panel {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+        padding: 12px;
+      }
+
+      .node-editor {
+        display: grid;
+        gap: 8px;
+      }
+
+      .node-editor h2,
+      .sql-panel h2 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .node-editor h3 {
+        margin: 4px 0;
+        font-size: 14px;
+      }
+
+      .node-editor label {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .node-editor input,
+      .node-editor select,
+      .node-editor textarea,
+      .sql-panel textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px;
+      }
+
+      .node-editor .button-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .node-editor .danger {
+        border-color: #e5aca8;
+        color: var(--danger);
+      }
+
+      .hint,
+      .readonly-tip {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .sql-block {
+        display: grid;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .sql-block-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .sql-block h3 {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .sql-block textarea {
+        resize: vertical;
+        background: #f7faf5;
+      }
+
+      .repo-node {
+        min-width: 220px;
+        max-width: 300px;
+        border: 1px solid #b9d4c4;
+        border-left: 5px solid #5eb087;
+        border-radius: 12px;
+        background: #fcfffd;
+        box-shadow: 0 4px 12px rgba(25, 44, 31, 0.08);
+        padding: 8px;
+      }
+
+      .repo-node.selected {
+        border-color: #4b9f75;
+        box-shadow: 0 0 0 2px rgba(52, 134, 95, 0.22);
+      }
+
+      .repo-node-head {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .tree-toggle {
+        width: 20px;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        border: 1px solid #b9d4c4;
+        background: #f2fcf6;
+        color: #205739;
+        padding: 0;
+        line-height: 1;
+      }
+
+      .tree-toggle.collapsed {
+        background: #f8fbf8;
+      }
+
+      .repo-node-type {
+        flex: none;
+        font-size: 10px;
+        border-radius: 999px;
+        padding: 1px 6px;
+        background: #def0e5;
+        color: #205739;
+      }
+
+      .repo-node-path {
+        font-size: 12px;
+        font-weight: 700;
+        word-break: break-all;
+      }
+
+      .repo-node-desc {
+        margin-top: 5px;
+        font-size: 12px;
+        color: #365343;
+      }
+
+      @media (max-width: 1080px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .map-canvas {
+          min-height: 58vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/web/main.tsx"></script>
+  </body>
+</html>

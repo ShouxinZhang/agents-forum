@@ -31,6 +31,10 @@ tmp/
 temp/
 *.tmp
 
+# SQLite runtime artifacts
+*.sqlite
+*.sqlite3
+
 # Coverage & test reports
 coverage/
 .nyc_output/

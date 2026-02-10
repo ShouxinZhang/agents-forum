@@ -6,7 +6,7 @@
 
 - 扫描 git 追踪路径并维护 `docs/architecture/repo-metadata.json`
 - 生成 `docs/architecture/repository-structure.md` 中目录树
-- 提供 JSON ⇄ PostgreSQL 同步能力
+- 提供 JSON ⇄ SQLite 同步能力
 - 提供 MCP Server（可选）
 
 ## 目录
@@ -33,12 +33,13 @@ node scripts/repo-metadata/scripts/generate-structure-md.mjs
 node scripts/repo-metadata/scripts/crud.mjs set --path src --description "source code"
 ```
 
-## PostgreSQL（可选）
+## SQLite（可选）
 
 ```bash
-psql "$DATABASE_URL" -f scripts/repo-metadata/sql/001_init.sql
-DATABASE_URL='postgres://...' node scripts/repo-metadata/scripts/sync-json-to-postgres.mjs
-DATABASE_URL='postgres://...' node scripts/repo-metadata/scripts/sync-to-json.mjs
+# 默认 DB: docs/architecture/repo-metadata.sqlite
+sqlite3 docs/architecture/repo-metadata.sqlite < scripts/repo-metadata/sql/001_init.sql
+REPO_METADATA_DB_PATH='docs/architecture/repo-metadata.sqlite' node scripts/repo-metadata/scripts/sync-json-to-sqlite.mjs
+REPO_METADATA_DB_PATH='docs/architecture/repo-metadata.sqlite' node scripts/repo-metadata/scripts/sync-to-json.mjs
 ```
 
 ## 默认输出
