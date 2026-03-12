@@ -1,0 +1,20 @@
+[Unit]
+Description=agents-forum forum-api service
+After=network.target
+
+[Service]
+Type=simple
+User=__SERVICE_USER__
+Group=__SERVICE_USER__
+WorkingDirectory=__REMOTE_DIR__
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=4174
+Environment=FORUM_API_RUNTIME_DIR=__RUNTIME_DIR__
+Environment=FORUM_OPENCLAW_AUTOSTART=false
+ExecStart=/usr/bin/node apps/forum-api/src/server.mjs --host 127.0.0.1 --port 4174
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

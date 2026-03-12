@@ -7,7 +7,7 @@
     ],
     "generateMdDepth": 2
   },
-  "updatedAt": "2026-02-10T03:03:57.632Z",
+  "updatedAt": "2026-03-12T18:08:23.251Z",
   "nodes": {
     ".gitattributes": {
       "type": "file",
@@ -48,6 +48,246 @@
       "tags": [],
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "apps/forum-api": {
+      "type": "directory",
+      "description": "论坛后端应用（Hono + Node）。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-03-11T16:07:50.375Z"
+    },
+    "apps/forum-api/package.json": {
+      "type": "file",
+      "description": "forum-api workspace 包配置。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-03-11T16:07:50.377Z"
+    },
+    "apps/forum-api/src": {
+      "type": "directory",
+      "description": "论坛后端源码目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-03-11T16:07:50.405Z"
+    },
+    "apps/forum-api/src/modules": {
+      "type": "directory",
+      "description": "forum-api 业务模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-api/src/modules/agent-observer": {
+      "type": "directory",
+      "description": "论坛后端 Agent 透明观测模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:53:03Z"
+    },
+    "apps/forum-api/src/modules/agent-observer/data.mjs": {
+      "type": "file",
+      "description": "Agent profile 种子与 runtime recent calls 合并逻辑。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:18:31.592Z"
+    },
+    "apps/forum-api/src/modules/agent-observer/routes.mjs": {
+      "type": "file",
+      "description": "forum-api Agent 透明观测路由定义。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:53:03Z"
+    },
+    "apps/forum-api/src/modules/agent-observer/runtime-events.mjs": {
+      "type": "file",
+      "description": "Agent recent calls 的共享 runtime event 文件读写。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:18:31.592Z"
+    },
+    "apps/forum-api/src/modules/auth": {
+      "type": "directory",
+      "description": "论坛后端认证模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:39:29Z"
+    },
+    "apps/forum-api/src/modules/auth/data.mjs": {
+      "type": "file",
+      "description": "论坛后端认证用户与内存 session 数据。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:39:29Z"
+    },
+    "apps/forum-api/src/modules/auth/routes.mjs": {
+      "type": "file",
+      "description": "forum-api 认证路由定义。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:39:29Z"
+    },
+    "apps/forum-api/src/modules/bot-auth": {
+      "type": "directory",
+      "description": "论坛 Bot 账号与角色基线模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:38:40+08:00"
+    },
+    "apps/forum-api/src/modules/bot-auth/data.mjs": {
+      "type": "file",
+      "description": "多 Claw Bot 论坛账号、persona 与写权限种子数据。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:38:40+08:00"
+    },
+    "apps/forum-api/src/modules/forum": {
+      "type": "directory",
+      "description": "论坛后端只读模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-api/src/modules/forum/data.mjs": {
+      "type": "file",
+      "description": "论坛板块、线程摘要和写入领域逻辑。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:18:31.592Z"
+    },
+    "apps/forum-api/src/modules/forum/routes.mjs": {
+      "type": "file",
+      "description": "forum-api 论坛读写路由定义。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-api/src/modules/forum/seed.mjs": {
+      "type": "file",
+      "description": "论坛板块与线程初始种子数据。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:18:31.592Z"
+    },
+    "apps/forum-api/src/modules/forum/store.mjs": {
+      "type": "file",
+      "description": "forum state 运行时文件持久化读写。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:18:31.592Z"
+    },
+    "apps/forum-api/src/modules/mcp": {
+      "type": "directory",
+      "description": "forum MCP stdio 服务模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "apps/forum-api/src/modules/mcp/audit-log.mjs": {
+      "type": "file",
+      "description": "forum MCP 进程内审计与 runtime event 持久化 hook。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:18:31.592Z"
+    },
+    "apps/forum-api/src/modules/mcp/config.mjs": {
+      "type": "file",
+      "description": "forum MCP origin、超时和登录配置解析。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "apps/forum-api/src/modules/mcp/forum-bot": {
+      "type": "directory",
+      "description": "多 Bot 节奏控制与审批状态模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:47:00.000Z"
+    },
+    "apps/forum-api/src/modules/mcp/forum-bot/policy.mjs": {
+      "type": "file",
+      "description": "多 Bot quota、cooldown 与审批候选持久化策略。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:47:00.000Z"
+    },
+    "apps/forum-api/src/modules/mcp/forum-client.mjs": {
+      "type": "file",
+      "description": "forum MCP 对 forum-api 与 observer API 的 HTTP client 封装。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "apps/forum-api/src/modules/mcp/server.mjs": {
+      "type": "file",
+      "description": "forum MCP stdio server 入口，暴露 Feed/详情/回复/审计 tools。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "apps/forum-api/src/modules/openclaw-orchestrator": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:33:55.934Z"
+    },
+    "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:33:55.934Z"
+    },
+    "apps/forum-api/src/modules/openclaw-orchestrator/store.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:33:55.934Z"
+    },
+    "apps/forum-api/src/modules/openclaw-orchestrator/workflow.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:33:55.934Z"
+    },
+    "apps/forum-api/src/server.mjs": {
+      "type": "file",
+      "description": "forum-api HTTP 服务入口。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "human",
+      "updatedAt": "2026-03-11T16:29:19.831Z"
     },
     "apps/forum-web": {
       "type": "directory",
@@ -289,6 +529,150 @@
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
     },
+    "apps/forum-web/src/modules": {
+      "type": "directory",
+      "description": "前端业务模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/agent-observer": {
+      "type": "directory",
+      "description": "Agent 透明观测前端模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/agent-observer/api.ts": {
+      "type": "file",
+      "description": "Agent 透明观测 API client。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:53:03Z"
+    },
+    "apps/forum-web/src/modules/agent-observer/components": {
+      "type": "directory",
+      "description": "Agent 透明观测组件目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/agent-observer/components/inspector-panel.tsx": {
+      "type": "file",
+      "description": "Agent Inspector 侧栏组件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/agent-observer/data.ts": {
+      "type": "file",
+      "description": "Agent 透明观测静态演示数据。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/agent-observer/types.ts": {
+      "type": "file",
+      "description": "Agent 透明观测前端类型定义。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:53:03Z"
+    },
+    "apps/forum-web/src/modules/auth": {
+      "type": "directory",
+      "description": "认证前端模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/auth/api.ts": {
+      "type": "file",
+      "description": "认证 API client。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:39:29Z"
+    },
+    "apps/forum-web/src/modules/auth/components": {
+      "type": "directory",
+      "description": "认证页面组件目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/auth/components/login-page.tsx": {
+      "type": "file",
+      "description": "论坛登录页组件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/forum": {
+      "type": "directory",
+      "description": "论坛前端模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/forum/api.ts": {
+      "type": "file",
+      "description": "论坛读取 API client。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/forum/types.ts": {
+      "type": "file",
+      "description": "论坛板块、帖子与楼层类型定义。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/forum/utils.ts": {
+      "type": "file",
+      "description": "论坛模块通用数据转换工具。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/shared": {
+      "type": "directory",
+      "description": "前端共享业务模块目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/shared/components": {
+      "type": "directory",
+      "description": "共享业务组件目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/shared/components/role-badge.tsx": {
+      "type": "file",
+      "description": "用户角色徽章组件。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
     "apps/forum-web/tsconfig.app.json": {
       "type": "file",
       "description": "JSON 配置/数据文件：tsconfig.app.json",
@@ -369,6 +753,126 @@
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
     },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan": {
+      "type": "directory",
+      "description": "Agents Forum 分模块依赖实现图子计划目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan.md": {
+      "type": "file",
+      "description": "Agents Forum 分模块依赖实现图总入口。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/00-overview.md": {
+      "type": "file",
+      "description": "分模块依赖计划总览。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/01-module-map.md": {
+      "type": "file",
+      "description": "论坛模块边界与依赖图。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/02-phase-a-foundation.md": {
+      "type": "file",
+      "description": "阶段 A：契约与基础模块计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/03-phase-b-auth.md": {
+      "type": "file",
+      "description": "阶段 B：认证与会话计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/04-phase-c-forum-read.md": {
+      "type": "file",
+      "description": "阶段 C：论坛读取能力计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/05-phase-d-forum-write.md": {
+      "type": "file",
+      "description": "阶段 D：论坛写能力计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/06-phase-e-agent-observer.md": {
+      "type": "file",
+      "description": "阶段 E：Agent 透明观测计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/07-phase-f-mcp.md": {
+      "type": "file",
+      "description": "阶段 F：MCP 接入计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/08-phase-g-quality.md": {
+      "type": "file",
+      "description": "阶段 G：治理与质量计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/09-phase-h-openclaw-skill.md": {
+      "type": "file",
+      "description": "阶段 H：OpenClaw Forum Skill 计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/10-phase-i-multi-claw-bots.md": {
+      "type": "file",
+      "description": "阶段 I：多 Claw Bot 接入计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/11-phase-j-skill-dev-and-test.md": {
+      "type": "file",
+      "description": "阶段 J：Skill 开发与测试体系计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/12-reddit-feed-and-detail.md": {
+      "type": "file",
+      "description": "Reddit 式 Feed 与独立详情架构计划。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
     "docs/dev_plan/agents_forum_mvp_plan.md": {
       "type": "file",
       "description": "Agents Forum MVP 分阶段计划。",
@@ -400,6 +904,214 @@
       "tags": [],
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "docs/dev_plan/old": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:15:10.687Z"
+    },
+    "docs/dev_plan/old/README.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:15:10.687Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/00-overview.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/01-module-map.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/02-phase-a-foundation.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/03-phase-b-auth.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/04-phase-c-forum-read.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/05-phase-d-forum-write.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/06-phase-e-agent-observer.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/07-phase-f-mcp.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/08-phase-g-quality.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/09-phase-h-openclaw-skill.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/10-phase-i-multi-claw-bots.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/11-phase-j-skill-dev-and-test.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_module_dependency_diagram_plan/12-reddit-feed-and-detail.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/agents_forum_mvp_plan.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:15:10.687Z"
+    },
+    "docs/dev_plan/old/image": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:15:10.687Z"
+    },
+    "docs/dev_plan/old/image/agents_forum_mvp_plan": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:15:10.687Z"
+    },
+    "docs/dev_plan/old/image/agents_forum_mvp_plan/1770651084283.png": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:15:10.687Z"
+    },
+    "docs/dev_plan/old/openclaw-forum-bot-personas.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/old/openclaw-forum-bot-safety-policy.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:18:13.963Z"
+    },
+    "docs/dev_plan/openclaw-forum-bot-personas.md": {
+      "type": "file",
+      "description": "OpenClaw Forum Bot persona 规划文档。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:38:40+08:00"
+    },
+    "docs/dev_plan/openclaw-forum-bot-safety-policy.md": {
+      "type": "file",
+      "description": "OpenClaw Forum Bot 安全策略与治理边界文档。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:38:40+08:00"
+    },
+    "docs/dev_plan/openclaw-multi-bot-forum-plan.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T10:15:10.687Z"
     },
     "package-lock.json": {
       "type": "file",
@@ -857,6 +1569,70 @@
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
     },
+    "skills/bot-content-safety-check": {
+      "type": "directory",
+      "description": "Bot 发言前的重复度、敏感词和上下文安全检查 skill 目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:38:40+08:00"
+    },
+    "skills/bot-content-safety-check/SKILL.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/bot-content-safety-check/references": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/bot-content-safety-check/references/rules.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/bot-content-safety-check/scripts": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/bot-content-safety-check/scripts/check-content.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/bot-content-safety-check/scripts/smoke.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/bot-content-safety-check/scripts/status.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
     "skills/build-check": {
       "type": "directory",
       "description": "目录：build-check",
@@ -969,6 +1745,134 @@
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
     },
+    "skills/forum-audit-viewer": {
+      "type": "directory",
+      "description": "多 Bot 论坛审计查看与聚合 skill 目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:38:40+08:00"
+    },
+    "skills/forum-audit-viewer/SKILL.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/forum-audit-viewer/scripts": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/forum-audit-viewer/scripts/smoke.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/forum-audit-viewer/scripts/status.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/forum-audit-viewer/scripts/view-audit.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/forum-mcp-smoke": {
+      "type": "directory",
+      "description": "论坛读取链路 smoke skill 目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:18:02Z"
+    },
+    "skills/forum-mcp-smoke/SKILL.md": {
+      "type": "file",
+      "description": "forum-mcp-smoke 技能入口说明。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:18:02Z"
+    },
+    "skills/forum-mcp-smoke/references": {
+      "type": "directory",
+      "description": "forum-mcp-smoke 参考资料目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:18:02Z"
+    },
+    "skills/forum-mcp-smoke/references/current-contract.md": {
+      "type": "file",
+      "description": "论坛读取 smoke 当前契约摘要。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:18:02Z"
+    },
+    "skills/forum-mcp-smoke/scripts": {
+      "type": "directory",
+      "description": "forum-mcp-smoke 脚本目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:18:02Z"
+    },
+    "skills/forum-mcp-smoke/scripts/mcp-smoke.mjs": {
+      "type": "file",
+      "description": "通过 stdio 启动 forum MCP 并执行 MCP smoke 的脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/forum-mcp-smoke/scripts/mcp-smoke.sh": {
+      "type": "file",
+      "description": "forum-mcp-smoke 的 MCP smoke 入口包装脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/forum-mcp-smoke/scripts/smoke.mjs": {
+      "type": "file",
+      "description": "论坛读取 smoke 结构化验证脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:18:02Z"
+    },
+    "skills/forum-mcp-smoke/scripts/smoke.sh": {
+      "type": "file",
+      "description": "forum-mcp-smoke 运行入口包装脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:18:02Z"
+    },
+    "skills/forum-mcp-smoke/scripts/status.sh": {
+      "type": "file",
+      "description": "forum-mcp-smoke 状态检查脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:18:02Z"
+    },
     "skills/git-management": {
       "type": "directory",
       "description": "目录：git-management",
@@ -1072,6 +1976,222 @@
       "tags": [],
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "skills/multi-bot-runner": {
+      "type": "directory",
+      "description": "批量驱动多个 Bot 按 Feed -> Detail -> Reply 执行论坛 smoke 的 skill 目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-12T08:38:40+08:00"
+    },
+    "skills/multi-bot-runner/SKILL.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/multi-bot-runner/scripts": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/multi-bot-runner/scripts/run.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/multi-bot-runner/scripts/smoke.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/multi-bot-runner/scripts/status.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T08:36:36.122Z"
+    },
+    "skills/openclaw-forum-bootstrap": {
+      "type": "directory",
+      "description": "OpenClaw forum workspace bootstrap skill 目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bootstrap/SKILL.md": {
+      "type": "file",
+      "description": "openclaw-forum-bootstrap 技能入口说明。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bootstrap/references": {
+      "type": "directory",
+      "description": "openclaw-forum-bootstrap 参考资料目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bootstrap/references/workspace-layout.md": {
+      "type": "file",
+      "description": "OpenClaw workspace 布局与当前边界说明。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bootstrap/scripts": {
+      "type": "directory",
+      "description": "openclaw-forum-bootstrap 脚本目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bootstrap/scripts/bootstrap.sh": {
+      "type": "file",
+      "description": "将论坛 smoke skill 安装到 OpenClaw workspace 的脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bootstrap/scripts/install-check.sh": {
+      "type": "file",
+      "description": "openclaw-forum-bootstrap 安装检查脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bootstrap/scripts/smoke.sh": {
+      "type": "file",
+      "description": "通过 workspace 中的 forum-mcp-smoke 执行读链路 smoke 的脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bootstrap/scripts/start-mcp.sh": {
+      "type": "file",
+      "description": "通过 bootstrap skill 启动 forum MCP 的脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bootstrap/scripts/status.sh": {
+      "type": "file",
+      "description": "openclaw-forum-bootstrap 状态检查脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T18:33:29Z"
+    },
+    "skills/openclaw-forum-bot": {
+      "type": "directory",
+      "description": "OpenClaw forum bot skill 目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/SKILL.md": {
+      "type": "file",
+      "description": "openclaw-forum-bot 技能入口说明。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/references": {
+      "type": "directory",
+      "description": "openclaw-forum-bot 参考资料目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/references/forum-actions.md": {
+      "type": "file",
+      "description": "论坛动作与自然语言触发映射说明。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/references/persona-examples.md": {
+      "type": "file",
+      "description": "Claw A/B/C/Mod 论坛 persona 示例。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/references/posting-policy.md": {
+      "type": "file",
+      "description": "论坛写动作边界与回帖前检查策略。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/scripts": {
+      "type": "directory",
+      "description": "openclaw-forum-bot 脚本目录。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/scripts/bootstrap.sh": {
+      "type": "file",
+      "description": "将 openclaw-forum-bot 安装到 OpenClaw workspace 的脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/scripts/login.sh": {
+      "type": "file",
+      "description": "校验论坛登录凭据是否可用的脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/scripts/start-mcp.sh": {
+      "type": "file",
+      "description": "复用 helper skill 启动 forum MCP 的脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/scripts/status.sh": {
+      "type": "file",
+      "description": "openclaw-forum-bot 状态检查脚本。",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "llm",
+      "updatedAt": "2026-03-11T19:07:26.786Z"
     },
     "skills/repo-structure-sync": {
       "type": "directory",

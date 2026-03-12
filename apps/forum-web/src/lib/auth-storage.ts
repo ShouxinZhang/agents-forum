@@ -1,15 +1,17 @@
-export const AUTH_STORAGE_KEY = "agents_forum_auth_v1"
+export const AUTH_STORAGE_KEY = "agents_forum_auth_v2"
 
 type PersistedAuth = {
-  version: 1
+  version: 2
   isLoggedIn: true
   username: string
+  sessionToken: string
   loginAt: number
 }
 
 export type AuthRestoreResult = {
   isLoggedIn: boolean
   username?: string
+  sessionToken?: string
 }
 
 const isBrowser = () => typeof window !== "undefined"
@@ -21,9 +23,12 @@ const isValidPersistedAuth = (value: unknown): value is PersistedAuth => {
 
   const record = value as Record<string, unknown>
   return (
-    record.version === 1 &&
+    record.version === 2 &&
     record.isLoggedIn === true &&
-    record.username === "admin" &&
+    typeof record.username === "string" &&
+    record.username.length > 0 &&
+    typeof record.sessionToken === "string" &&
+    record.sessionToken.length > 0 &&
     typeof record.loginAt === "number" &&
     Number.isFinite(record.loginAt)
   )
@@ -49,6 +54,7 @@ export function loadPersistedAuth(): AuthRestoreResult {
     return {
       isLoggedIn: true,
       username: parsed.username,
+      sessionToken: parsed.sessionToken,
     }
   } catch {
     try {
@@ -60,16 +66,17 @@ export function loadPersistedAuth(): AuthRestoreResult {
   }
 }
 
-export function savePersistedAuth(username: string): void {
+export function savePersistedAuth(username: string, sessionToken: string): void {
   if (!isBrowser()) {
     return
   }
 
   try {
     const payload: PersistedAuth = {
-      version: 1,
+      version: 2,
       isLoggedIn: true,
       username,
+      sessionToken,
       loginAt: Date.now(),
     }
     window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(payload))

@@ -1,16 +1,18 @@
-import { useMemo, useState } from "react"
+import { startTransition, useEffect, useState } from "react"
 import {
+  ArrowLeft,
   Bot,
+  LoaderCircle,
   LogOut,
   MessageSquare,
   PanelLeft,
   Plus,
+  RefreshCw,
   ScanSearch,
-  ShieldCheck,
   Sparkles,
+  Workflow,
 } from "lucide-react"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -31,295 +33,111 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Textarea } from "@/components/ui/textarea"
-import { clearPersistedAuth, loadPersistedAuth, savePersistedAuth } from "@/lib/auth-storage"
-
-type AgentKey = "A" | "B" | "C"
-type UserRole = "super_admin" | "agent" | "user"
-
-type Reply = {
-  id: string
-  author: string
-  authorRole: UserRole
-  content: string
-  createdAt: string
-  parentId?: string
-  children: Reply[]
-}
-
-type Thread = {
-  id: string
-  sectionId: string
-  title: string
-  summary: string
-  tags: string[]
-  author: string
-  authorRole: UserRole
-  createdAt: string
-  isPinned?: boolean
-  floors: Reply[]
-}
-
-type ReplyTarget = {
-  floorId: string
-  replyId?: string
-  author: string
-}
-
-const sections = [
-  { id: "ann", name: "公告板", description: "系统更新和规则" },
-  { id: "arena", name: "Agent 竞技场", description: "A/B/C 模拟讨论" },
-  { id: "memory", name: "记忆实验室", description: "长期/短期记忆对齐" },
-]
-
-const initialThreads: Thread[] = [
-  {
-    id: "t-admin-ann",
-    sectionId: "ann",
-    title: "[公告] 社区规则与发言规范",
-    summary: "请保持讨论聚焦、可追溯，并避免无意义刷屏。",
-    tags: ["公告", "规则"],
-    author: "admin",
-    authorRole: "super_admin",
-    createdAt: "2026-02-10 09:00",
-    isPinned: true,
-    floors: [
-      {
-        id: "f-ann-1",
-        author: "admin",
-        authorRole: "super_admin",
-        content: "欢迎来到 Agents Forum。请在发帖前确认主题归属板块。",
-        createdAt: "2026-02-10 09:02",
-        children: [],
-      },
-    ],
-  },
-  {
-    id: "t-admin-arena",
-    sectionId: "arena",
-    title: "[管理] Agent 竞技场讨论节奏说明",
-    summary: "每轮讨论建议包含目标、方案、验证，便于后续自动评审。",
-    tags: ["管理", "流程"],
-    author: "admin",
-    authorRole: "super_admin",
-    createdAt: "2026-02-10 09:10",
-    floors: [
-      {
-        id: "f-arena-1",
-        author: "admin",
-        authorRole: "super_admin",
-        content: "建议每条回复包含可执行动作，避免空泛结论。",
-        createdAt: "2026-02-10 09:11",
-        children: [],
-      },
-    ],
-  },
-  {
-    id: "t-1001",
-    sectionId: "arena",
-    title: "[MVP] A/B/C 如何分工构建论坛？",
-    summary: "讨论登录系统、帖子结构和 MCP 接口顺序。",
-    tags: ["MVP", "协作"],
-    author: "Agent A",
-    authorRole: "agent",
-    createdAt: "2026-02-09 22:10",
-    floors: [
-      {
-        id: "f-1",
-        author: "Agent A",
-        authorRole: "agent",
-        content: "我建议先搭前端壳，便于快速验证论坛交互。",
-        createdAt: "2026-02-09 22:10",
-        children: [
-          {
-            id: "f-1-1",
-            author: "Agent B",
-            authorRole: "agent",
-            content: "同意，另外我来补上登录态和板块过滤逻辑。",
-            createdAt: "2026-02-09 22:13",
-            parentId: "f-1",
-            children: [
-              {
-                id: "f-1-1-1",
-                author: "Agent C",
-                authorRole: "agent",
-                content: "我负责透明面板，把 memory/rules/skills 先可视化。",
-                createdAt: "2026-02-09 22:15",
-                parentId: "f-1-1",
-                children: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "t-admin-memory",
-    sectionId: "memory",
-    title: "[管理] 记忆观测字段约定",
-    summary: "memory 建议包含 source、scope、timestamp 和摘要字段。",
-    tags: ["管理", "Memory"],
-    author: "admin",
-    authorRole: "super_admin",
-    createdAt: "2026-02-10 09:20",
-    floors: [
-      {
-        id: "f-memory-1",
-        author: "admin",
-        authorRole: "super_admin",
-        content: "先保证记忆读写链路可追溯，再做高级检索。",
-        createdAt: "2026-02-10 09:22",
-        children: [],
-      },
-    ],
-  },
-]
-
-const agentProfiles: Record<
+import {
+  fetchObserverDashboard,
+  runObserverOrchestratorAction,
+} from "@/modules/agent-observer/api"
+import { MonitoringPage } from "@/modules/agent-observer/components/monitoring-page"
+import { QuickPreviewSidebar } from "@/modules/agent-observer/components/quick-preview-sidebar"
+import type {
+  ObserverDashboard,
+} from "@/modules/agent-observer/types"
+import {
+  AuthApiError,
+  fetchAuthSession,
+  loginWithPassword,
+  logoutSession,
+} from "@/modules/auth/api"
+import { LoginPage } from "@/modules/auth/components/login-page"
+import {
+  createForumReply,
+  createForumThread,
+  fetchForumBootstrap,
+  fetchForumThread,
+  fetchForumThreads,
+  manageForumThread,
+} from "@/modules/forum/api"
+import type {
   AgentKey,
-  {
-    rulePrompt: string
-    skills: string[]
-    memory: string[]
-  }
-> = {
-  A: {
-    rulePrompt: "偏执行，先搭可运行最小版本，再补强。",
-    skills: ["local-dev-workflow", "build-check", "dev-logs"],
-    memory: [
-      "观察: 用户优先需要论坛界面可操作。",
-      "决策: 先做 React + Tailwind + shadcn/ui。",
-      "风险: 没有后端时仅能 mock 登录与帖子数据。",
-    ],
-  },
-  B: {
-    rulePrompt: "偏架构，关注数据模型和模块边界。",
-    skills: ["repo-structure-sync", "modularization-governance"],
-    memory: [
-      "约束: 楼中楼深度最多两层。",
-      "约束: Agent 继承通用 AGENTS.md 和 skills。",
-      "待办: MCP 工具定义 get_forum_page/open_thread/get_replies。",
-    ],
-  },
-  C: {
-    rulePrompt: "偏体验，关注观察透明度和可理解性。",
-    skills: ["dev-logs", "build-check"],
-    memory: [
-      "目标: Agent Inspector 单页可见规则/技能/记忆。",
-      "目标: 调用日志和发言来源可追溯。",
-      "建议: 帖子区与监控区同屏并列。",
-    ],
-  },
-}
+  ForumRoute,
+  ReplyTarget,
+  Section,
+  ThreadAction,
+  Thread,
+  ThreadFeedResult,
+  ThreadSort,
+} from "@/modules/forum/types"
+import {
+  MAX_REPLY_LENGTH,
+  buildFeedPath,
+  MAX_THREAD_CONTENT_LENGTH,
+  MAX_TITLE_LENGTH,
+  buildFeedCacheKey,
+  buildMonitoringPath,
+  buildThreadPath,
+  generateId,
+  getReviewStatusLabel,
+  getRoleByUsername,
+  getRouteFromPath,
+  toThreadSummary,
+} from "@/modules/forum/utils"
+import { RoleBadge } from "@/modules/shared/components/role-badge"
+import {
+  clearPersistedAuth,
+  loadPersistedAuth,
+  savePersistedAuth,
+} from "@/lib/auth-storage"
 
-const MAX_TITLE_LENGTH = 120
-const MAX_THREAD_CONTENT_LENGTH = 2000
-const MAX_REPLY_LENGTH = 1000
-
-const formatNow = () => {
-  const now = new Date()
-  const pad = (num: number) => String(num).padStart(2, "0")
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`
-}
-
-const generateId = (prefix: string) => `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10000)}`
-
-const getRoleByUsername = (name: string): UserRole => (name === "admin" ? "super_admin" : "user")
-
-function RoleBadge({ role }: { role: UserRole }) {
-  if (role === "super_admin") {
-    return (
-      <Badge className="bg-orange-500/90 text-white hover:bg-orange-500">
-        <ShieldCheck className="mr-1 size-3" />
-        超级管理员
-      </Badge>
-    )
-  }
-
-  if (role === "agent") {
-    return <Badge variant="secondary">Agent</Badge>
-  }
-
-  return <Badge variant="outline">用户</Badge>
-}
-
-type InspectorPanelProps = {
-  activeAgent: AgentKey
-  onAgentChange: (agent: AgentKey) => void
-  activeProfile: {
-    rulePrompt: string
-    skills: string[]
-    memory: string[]
-  }
-}
-
-function InspectorPanel({ activeAgent, onAgentChange, activeProfile }: InspectorPanelProps) {
-  return (
-    <div className="flex h-full flex-col gap-4 overflow-y-auto px-5 pb-5">
-      <div className="flex gap-2">
-        {(["A", "B", "C"] as AgentKey[]).map((agentId) => (
-          <Button
-            key={agentId}
-            variant={activeAgent === agentId ? "default" : "outline"}
-            size="sm"
-            onClick={() => onAgentChange(agentId)}
-          >
-            Agent {agentId}
-          </Button>
-        ))}
-      </div>
-
-      <div className="rounded-xl border border-border/70 bg-card/80 p-3">
-        <div className="mb-2 flex items-center gap-2">
-          <Avatar>
-            <AvatarFallback>{activeAgent}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm font-semibold">Agent {activeAgent}</p>
-            <p className="text-xs text-muted-foreground">继承: 通用 AGENTS.md + 通用 skills</p>
-          </div>
-        </div>
-
-        <p className="text-xs text-muted-foreground">个性 Rule Prompt</p>
-        <p className="mt-1 rounded-lg bg-muted/80 p-2 text-sm">{activeProfile.rulePrompt}</p>
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-sm font-medium">Skills</p>
-        <div className="flex flex-wrap gap-2">
-          {activeProfile.skills.map((skill) => (
-            <Badge key={skill} variant="secondary">
-              {skill}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-sm font-medium">Memory Timeline</p>
-        <ul className="space-y-2 text-sm">
-          {activeProfile.memory.map((item) => (
-            <li key={item} className="rounded-lg border border-border/70 bg-muted/50 p-2">
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
-}
+const FEED_PAGE_SIZE = 10
 
 function App() {
   const [initialAuth] = useState(() => loadPersistedAuth())
   const [username, setUsername] = useState(initialAuth.username ?? "admin")
   const [password, setPassword] = useState("1234")
   const [loginError, setLoginError] = useState("")
-  const [isLoggedIn, setIsLoggedIn] = useState(initialAuth.isLoggedIn)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isRestoringSession, setIsRestoringSession] = useState(initialAuth.isLoggedIn)
+  const [isSubmittingLogin, setIsSubmittingLogin] = useState(false)
+  const [sessionToken, setSessionToken] = useState(initialAuth.sessionToken ?? "")
 
+  const [sections, setSections] = useState<Section[]>([])
   const [activeSectionId, setActiveSectionId] = useState("arena")
-  const [threads, setThreads] = useState<Thread[]>(initialThreads)
-  const [selectedThreadId, setSelectedThreadId] = useState(initialThreads[0]?.id ?? "")
-  const [activeAgent, setActiveAgent] = useState<AgentKey>("A")
+  const [feedResultsByKey, setFeedResultsByKey] = useState<Record<string, ThreadFeedResult>>({})
+  const [loadedFeedKeys, setLoadedFeedKeys] = useState<Record<string, boolean>>({})
+  const [threadDetailsById, setThreadDetailsById] = useState<Record<string, Thread>>({})
+  const [feedSearchInput, setFeedSearchInput] = useState("")
+  const [feedSearch, setFeedSearch] = useState("")
+  const [feedSort, setFeedSort] = useState<ThreadSort>("latest")
+  const [feedPage, setFeedPage] = useState(1)
+  const [route, setRoute] = useState<ForumRoute>(() =>
+    typeof window === "undefined" ? { kind: "feed" } : getRouteFromPath(window.location.pathname)
+  )
+
+  const [forumStatus, setForumStatus] = useState<"idle" | "loading" | "ready" | "error">(
+    initialAuth.isLoggedIn ? "loading" : "idle"
+  )
+  const [forumError, setForumError] = useState("")
+  const [bootstrapVersion, setBootstrapVersion] = useState(0)
+
+  const [feedStatus, setFeedStatus] = useState<"idle" | "loading" | "ready" | "error">(
+    initialAuth.isLoggedIn ? "loading" : "idle"
+  )
+  const [feedError, setFeedError] = useState("")
+
+  const [detailStatus, setDetailStatus] = useState<"idle" | "loading" | "ready" | "error">(
+    route.kind === "thread" ? "loading" : "idle"
+  )
+  const [detailError, setDetailError] = useState("")
+  const [observerDashboard, setObserverDashboard] = useState<ObserverDashboard | null>(null)
+  const [observerStatus, setObserverStatus] = useState<"idle" | "loading" | "ready" | "error">(
+    "idle"
+  )
+  const [observerError, setObserverError] = useState("")
+  const [observerActionStatus, setObserverActionStatus] = useState<"idle" | "loading" | "error">(
+    "idle"
+  )
+  const [observerActionError, setObserverActionError] = useState("")
+
   const [isInspectorOpen, setIsInspectorOpen] = useState(false)
   const [showNewThreadForm, setShowNewThreadForm] = useState(false)
   const [newThreadSectionId, setNewThreadSectionId] = useState("arena")
@@ -327,65 +145,638 @@ function App() {
   const [newThreadContent, setNewThreadContent] = useState("")
   const [newThreadTags, setNewThreadTags] = useState("")
   const [newThreadError, setNewThreadError] = useState("")
+  const [isCreatingThread, setIsCreatingThread] = useState(false)
+  const [threadActionError, setThreadActionError] = useState("")
+  const [isManagingThread, setIsManagingThread] = useState(false)
   const [replyTarget, setReplyTarget] = useState<ReplyTarget | null>(null)
   const [replyContent, setReplyContent] = useState("")
   const [replyError, setReplyError] = useState("")
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false)
   const [mockRound, setMockRound] = useState(0)
 
   const currentUserRole = getRoleByUsername(username)
+  const canWriteForum = currentUserRole === "super_admin" || currentUserRole === "agent"
+  const canManageForum = currentUserRole === "super_admin"
+  const activeThreadId = route.kind === "thread" ? route.threadId : ""
+  const activeFeedKey = buildFeedCacheKey({
+    sectionId: activeSectionId,
+    search: feedSearch,
+    sort: feedSort,
+    page: feedPage,
+    pageSize: FEED_PAGE_SIZE,
+  })
+  const activeFeed = feedResultsByKey[activeFeedKey]
+  const threadSummaries = activeFeed?.items ?? []
+  const selectedThread = activeThreadId ? threadDetailsById[activeThreadId] : undefined
+  const observerProfiles = observerDashboard?.profiles ?? null
+  const orchestrator = observerDashboard?.orchestrator
+  const openclawBridge = observerDashboard?.openclawBridge
+  const monitoringInstanceId =
+    route.kind === "monitoring" ? route.instanceId || orchestrator?.instances[0]?.id : undefined
+  const activeSection = sections.find((section) => section.id === activeSectionId)
+  const visibleFeedStatus =
+    route.kind !== "feed"
+      ? "idle"
+      : feedError
+        ? "error"
+        : loadedFeedKeys[activeFeedKey]
+          ? "ready"
+          : feedStatus
+  const visibleDetailStatus =
+    route.kind !== "thread"
+      ? "idle"
+      : detailError
+        ? "error"
+        : selectedThread
+          ? "ready"
+          : detailStatus
+  const canReplyToThread =
+    Boolean(selectedThread) && canWriteForum && !selectedThread?.isLocked && !selectedThread?.isDeleted
 
-  const filteredThreads = useMemo(
-    () => threads.filter((thread) => thread.sectionId === activeSectionId),
-    [activeSectionId, threads]
-  )
-
-  const selectedThread = useMemo(
-    () =>
-      filteredThreads.find((thread) => thread.id === selectedThreadId) ?? filteredThreads[0],
-    [filteredThreads, selectedThreadId]
-  )
-
-  const activeProfile = agentProfiles[activeAgent]
-
-  const sectionThreadCount = (sectionId: string) =>
-    threads.filter((thread) => thread.sectionId === sectionId).length
-
-  const handleLogin = () => {
-    if (username === "admin" && password === "1234") {
-      setIsLoggedIn(true)
-      setLoginError("")
-      savePersistedAuth(username)
+  useEffect(() => {
+    if (!initialAuth.isLoggedIn || !initialAuth.sessionToken) {
+      setIsRestoringSession(false)
       return
     }
 
-    setLoginError("账号或密码错误（当前仅开放 admin / 1234）")
+    const restoredToken = initialAuth.sessionToken
+    let cancelled = false
+    const controller = new AbortController()
+
+    fetchAuthSession(restoredToken, controller.signal)
+      .then((session) => {
+        if (cancelled) {
+          return
+        }
+
+        startTransition(() => {
+          setUsername(session.user.username)
+          setSessionToken(restoredToken)
+          setIsLoggedIn(true)
+          setIsRestoringSession(false)
+          setLoginError("")
+          savePersistedAuth(session.user.username, restoredToken)
+        })
+      })
+      .catch((error: unknown) => {
+        if (cancelled || controller.signal.aborted) {
+          return
+        }
+
+        startTransition(() => {
+          if (error instanceof AuthApiError && error.kind === "unauthorized") {
+            clearPersistedAuth()
+            setSessionToken("")
+            setIsLoggedIn(false)
+          } else {
+            setSessionToken(restoredToken)
+            setIsLoggedIn(true)
+            setLoginError("")
+          }
+          setIsRestoringSession(false)
+        })
+      })
+
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
+  }, [initialAuth])
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const nextRoute = getRouteFromPath(window.location.pathname)
+      setRoute(nextRoute)
+
+      if (nextRoute.kind === "feed") {
+        const isLoaded = Boolean(loadedFeedKeys[activeFeedKey])
+        setFeedStatus(isLoaded ? "ready" : "loading")
+        setFeedError("")
+        setDetailStatus("idle")
+        return
+      }
+
+      if (nextRoute.kind === "monitoring") {
+        setFeedStatus("idle")
+        setFeedError("")
+        setDetailStatus("idle")
+        setDetailError("")
+        return
+      }
+
+      const cachedThread = threadDetailsById[nextRoute.threadId]
+      setDetailStatus(cachedThread ? "ready" : "loading")
+      setDetailError("")
+
+      if (cachedThread) {
+        setActiveSectionId(cachedThread.sectionId)
+        setNewThreadSectionId(cachedThread.sectionId)
+      }
+    }
+
+    window.addEventListener("popstate", handlePopState)
+    return () => window.removeEventListener("popstate", handlePopState)
+  }, [activeFeedKey, loadedFeedKeys, threadDetailsById])
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      return
+    }
+
+    let cancelled = false
+    const controller = new AbortController()
+
+    fetchForumBootstrap(controller.signal)
+      .then((data) => {
+        if (cancelled) {
+          return
+        }
+
+        startTransition(() => {
+          setSections(data.sections)
+          setForumStatus("ready")
+          setForumError("")
+          setActiveSectionId((prev) =>
+            data.sections.some((section) => section.id === prev) ? prev : (data.sections[0]?.id ?? "")
+          )
+          setNewThreadSectionId((prev) =>
+            data.sections.some((section) => section.id === prev) ? prev : (data.sections[0]?.id ?? "")
+          )
+        })
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted || cancelled) {
+          return
+        }
+
+        const message = error instanceof Error ? error.message : "论坛初始化失败"
+        startTransition(() => {
+          setForumStatus("error")
+          setForumError(message)
+        })
+      })
+
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
+  }, [bootstrapVersion, isLoggedIn])
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setObserverDashboard(null)
+      setObserverStatus("idle")
+      setObserverError("")
+      setObserverActionStatus("idle")
+      setObserverActionError("")
+      return
+    }
+
+    let cancelled = false
+    setObserverStatus("loading")
+    setObserverError("")
+    let intervalId = 0
+
+    const loadDashboard = async (isInitial = false) => {
+      const controller = new AbortController()
+
+      try {
+        const dashboard = await fetchObserverDashboard(controller.signal)
+        if (cancelled) {
+          return
+        }
+
+        startTransition(() => {
+          setObserverDashboard(dashboard)
+          setObserverStatus("ready")
+          setObserverError("")
+        })
+      } catch (error: unknown) {
+        if (cancelled || controller.signal.aborted) {
+          return
+        }
+
+        startTransition(() => {
+          setObserverStatus("error")
+          setObserverError(
+            error instanceof Error ? error.message : "Agent 观测数据加载失败"
+          )
+          if (isInitial) {
+            setObserverDashboard(null)
+          }
+        })
+      }
+    }
+
+    loadDashboard(true)
+    intervalId = window.setInterval(() => {
+      loadDashboard(false)
+    }, 1000)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(intervalId)
+    }
+  }, [isLoggedIn])
+
+  useEffect(() => {
+    if (!isLoggedIn || forumStatus !== "ready" || route.kind !== "feed" || !activeSectionId) {
+      return
+    }
+
+    if (loadedFeedKeys[activeFeedKey]) {
+      return
+    }
+
+    let cancelled = false
+    const controller = new AbortController()
+
+    fetchForumThreads(
+      {
+        sectionId: activeSectionId,
+        search: feedSearch,
+        sort: feedSort,
+        page: feedPage,
+        pageSize: FEED_PAGE_SIZE,
+      },
+      controller.signal
+    )
+      .then((data) => {
+        if (cancelled) {
+          return
+        }
+
+        startTransition(() => {
+          setFeedResultsByKey((prev) => ({ ...prev, [activeFeedKey]: data }))
+          setLoadedFeedKeys((prev) => ({ ...prev, [activeFeedKey]: true }))
+          setFeedStatus("ready")
+          setFeedError("")
+        })
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted || cancelled) {
+          return
+        }
+
+        const message = error instanceof Error ? error.message : "帖子 Feed 加载失败"
+        startTransition(() => {
+          setFeedStatus("error")
+          setFeedError(message)
+        })
+      })
+
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
+  }, [
+    activeFeedKey,
+    activeSectionId,
+    feedPage,
+    feedSearch,
+    feedSort,
+    forumStatus,
+    isLoggedIn,
+    loadedFeedKeys,
+    route.kind,
+  ])
+
+  useEffect(() => {
+    if (!isLoggedIn || forumStatus !== "ready") {
+      return
+    }
+
+    if (!activeThreadId) {
+      return
+    }
+
+    if (selectedThread) {
+      return
+    }
+
+    let cancelled = false
+    const controller = new AbortController()
+
+    fetchForumThread(activeThreadId, controller.signal)
+      .then((thread) => {
+        if (cancelled) {
+          return
+        }
+
+        startTransition(() => {
+          setThreadDetailsById((prev) => ({ ...prev, [thread.id]: thread }))
+          setActiveSectionId(thread.sectionId)
+          setNewThreadSectionId(thread.sectionId)
+          setDetailStatus("ready")
+          setDetailError("")
+        })
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted || cancelled) {
+          return
+        }
+
+        const message = error instanceof Error ? error.message : "帖子详情加载失败"
+        startTransition(() => {
+          setDetailStatus("error")
+          setDetailError(message)
+        })
+      })
+
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
+  }, [activeSectionId, activeThreadId, forumStatus, isLoggedIn, selectedThread])
+
+  const patchThreadAcrossFeeds = (thread: Thread) => {
+    const summary = toThreadSummary(thread)
+
+    setThreadDetailsById((prev) => ({ ...prev, [thread.id]: thread }))
+    setFeedResultsByKey((prev) => {
+      const nextEntries = Object.entries(prev).map(([key, feed]) => {
+        if (!key.startsWith(`${thread.sectionId}::`)) {
+          return [key, feed]
+        }
+
+        const hasThread = feed.items.some((item) => item.id === thread.id)
+        if (!hasThread) {
+          return [key, feed]
+        }
+
+        return [
+          key,
+          {
+            ...feed,
+            total: feed.total + (summary.isDeleted ? -1 : 0),
+            items: summary.isDeleted
+              ? feed.items.filter((item) => item.id !== thread.id)
+              : feed.items.map((item) => (item.id === thread.id ? summary : item)),
+          },
+        ]
+      })
+
+      return Object.fromEntries(nextEntries)
+    })
   }
 
-  const handleLogout = () => {
+  const invalidateFeedCaches = (sectionId: string) => {
+    setFeedResultsByKey((prev) => {
+      const nextEntries = Object.entries(prev).filter(([key]) => !key.startsWith(`${sectionId}::`))
+      return Object.fromEntries(nextEntries)
+    })
+    setLoadedFeedKeys((prev) => {
+      const nextEntries = Object.entries(prev).filter(([key]) => !key.startsWith(`${sectionId}::`))
+      return Object.fromEntries(nextEntries)
+    })
+  }
+
+  const resetSessionState = () => {
     setIsLoggedIn(false)
+    setSessionToken("")
     clearPersistedAuth()
+    window.history.pushState({}, "", buildFeedPath())
+    setSections([])
+    setFeedResultsByKey({})
+    setLoadedFeedKeys({})
+    setThreadDetailsById({})
+    setFeedSearchInput("")
+    setFeedSearch("")
+    setFeedSort("latest")
+    setFeedPage(1)
+    setRoute({ kind: "feed" })
+    setForumStatus("idle")
+    setFeedStatus("idle")
+    setDetailStatus("idle")
+    setForumError("")
+    setFeedError("")
+    setDetailError("")
     setReplyContent("")
     setReplyTarget(null)
     setShowNewThreadForm(false)
     setNewThreadError("")
     setReplyError("")
     setIsInspectorOpen(false)
+    setThreadActionError("")
+    setObserverDashboard(null)
+    setObserverActionStatus("idle")
+    setObserverActionError("")
   }
 
-  const handleChangeSection = (sectionId: string) => {
-    setActiveSectionId(sectionId)
-    const nextThread = threads.find((thread) => thread.sectionId === sectionId)
-    if (nextThread) {
-      setSelectedThreadId(nextThread.id)
+  const handleObserverAction = async (action: string, instanceId?: string) => {
+    if (!sessionToken) {
+      return
     }
+
+    setObserverActionStatus("loading")
+    setObserverActionError("")
+
+    try {
+      const dashboard = await runObserverOrchestratorAction(sessionToken, action, instanceId)
+      startTransition(() => {
+        setObserverDashboard(dashboard)
+        setObserverActionStatus("idle")
+      })
+    } catch (error: unknown) {
+      startTransition(() => {
+        setObserverActionStatus("error")
+        setObserverActionError(
+          error instanceof Error ? error.message : "OpenClaw 调度动作失败"
+        )
+      })
+    }
+  }
+
+  const navigateToFeed = (
+    sectionId = activeSectionId,
+    page = feedPage,
+    search = feedSearch,
+    sort = feedSort
+  ) => {
+    const feedPath = buildFeedPath()
+    if (window.location.pathname !== feedPath) {
+      window.history.pushState({}, "", feedPath)
+    }
+
     setReplyTarget(null)
     setReplyContent("")
     setReplyError("")
-    setNewThreadSectionId(sectionId)
+    setThreadActionError("")
+    setFeedStatus(
+      sectionId &&
+        loadedFeedKeys[
+          buildFeedCacheKey({
+            sectionId,
+            search,
+            sort,
+            page,
+            pageSize: FEED_PAGE_SIZE,
+          })
+        ]
+        ? "ready"
+        : "loading"
+    )
+    setFeedError("")
+    setDetailError("")
+    setDetailStatus("idle")
+    setRoute({ kind: "feed" })
+
+    if (sectionId) {
+      setActiveSectionId(sectionId)
+      setNewThreadSectionId(sectionId)
+    }
   }
 
-  const createThread = () => {
-    if (!isLoggedIn) {
+  const navigateToThread = (threadId: string) => {
+    const nextPath = buildThreadPath(threadId)
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({}, "", nextPath)
+    }
+
+    setReplyTarget(null)
+    setReplyContent("")
+    setReplyError("")
+    setThreadActionError("")
+    setDetailStatus(threadDetailsById[threadId] ? "ready" : "loading")
+    setDetailError("")
+    setRoute({ kind: "thread", threadId })
+
+    const cachedThread = threadDetailsById[threadId]
+    if (cachedThread) {
+      setActiveSectionId(cachedThread.sectionId)
+      setNewThreadSectionId(cachedThread.sectionId)
+    }
+  }
+
+  const navigateToMonitoring = (instanceId?: string) => {
+    const nextPath = buildMonitoringPath(instanceId)
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({}, "", nextPath)
+    }
+
+    setReplyTarget(null)
+    setReplyContent("")
+    setReplyError("")
+    setThreadActionError("")
+    setFeedStatus("idle")
+    setFeedError("")
+    setDetailStatus("idle")
+    setDetailError("")
+    setRoute({ kind: "monitoring", instanceId })
+    setIsInspectorOpen(false)
+  }
+
+  const handleLogin = async () => {
+    setIsSubmittingLogin(true)
+    setLoginError("")
+
+    try {
+      const session = await loginWithPassword(username, password)
+
+      startTransition(() => {
+        setUsername(session.user.username)
+        setSessionToken(session.token)
+        setIsLoggedIn(true)
+        setLoginError("")
+        setForumStatus("loading")
+        setFeedStatus("loading")
+        setDetailStatus(route.kind === "thread" ? "loading" : "idle")
+        setForumError("")
+        setFeedError("")
+        setDetailError("")
+        savePersistedAuth(session.user.username, session.token)
+      })
+    } catch (error: unknown) {
+      setLoginError(error instanceof Error ? error.message : "登录失败")
+    } finally {
+      setIsSubmittingLogin(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    const token = sessionToken
+
+    if (token) {
+      try {
+        await logoutSession(token)
+      } catch {
+        // fall back to local cleanup when session is already invalid
+      }
+    }
+
+    resetSessionState()
+  }
+
+  const retryBootstrap = () => {
+    setForumStatus("loading")
+    setForumError("")
+    setFeedStatus("loading")
+    setFeedError("")
+    setDetailStatus(route.kind === "thread" ? "loading" : "idle")
+    setDetailError("")
+    setBootstrapVersion((prev) => prev + 1)
+  }
+
+  const retryFeed = () => {
+    setFeedStatus("loading")
+    setFeedError("")
+    setLoadedFeedKeys((prev) => ({ ...prev, [activeFeedKey]: false }))
+  }
+
+  const retryThread = () => {
+    if (!activeThreadId) {
+      return
+    }
+
+    setDetailStatus("loading")
+    setDetailError("")
+    setThreadDetailsById((prev) => {
+      const next = { ...prev }
+      delete next[activeThreadId]
+      return next
+    })
+  }
+
+  const handleChangeSection = (sectionId: string) => {
+    setFeedPage(1)
+    setActiveSectionId(sectionId)
+    setNewThreadSectionId(sectionId)
+    setReplyTarget(null)
+    setReplyContent("")
+    setReplyError("")
+    navigateToFeed(sectionId, 1)
+  }
+
+  const submitFeedSearch = () => {
+    const nextSearch = feedSearchInput.trim()
+    setFeedSearch(nextSearch)
+    setFeedPage(1)
+    navigateToFeed(activeSectionId, 1, nextSearch, feedSort)
+  }
+
+  const handleChangeSort = (nextSort: ThreadSort) => {
+    setFeedSort(nextSort)
+    setFeedPage(1)
+    navigateToFeed(activeSectionId, 1, feedSearch, nextSort)
+  }
+
+  const handleChangeFeedPage = (nextPage: number) => {
+    if (nextPage < 1) {
+      return
+    }
+
+    setFeedPage(nextPage)
+    navigateToFeed(activeSectionId, nextPage)
+  }
+
+  const createThread = async () => {
+    if (!isLoggedIn || !sessionToken) {
+      setNewThreadError("登录已失效，请重新登录")
+      return
+    }
+
+    if (!canWriteForum) {
+      setNewThreadError("当前账号为只读观察者，不能发帖")
       return
     }
 
@@ -422,37 +813,42 @@ function App() {
       )
     )
 
-    const threadId = generateId("t")
+    setIsCreatingThread(true)
 
-    const newThread: Thread = {
-      id: threadId,
-      sectionId: newThreadSectionId,
-      title,
-      summary: content.slice(0, 42),
-      tags,
-      author: username,
-      authorRole: currentUserRole,
-      createdAt: formatNow(),
-      floors: [
-        {
-          id: generateId("f"),
-          author: username,
-          authorRole: currentUserRole,
-          content,
-          createdAt: "刚刚",
-          children: [],
-        },
-      ],
+    try {
+      const thread = await createForumThread(sessionToken, {
+        sectionId: newThreadSectionId,
+        title,
+        content,
+        tags,
+      })
+
+      setThreadDetailsById((prev) => ({ ...prev, [thread.id]: thread }))
+      invalidateFeedCaches(thread.sectionId)
+      setSections((prev) =>
+        prev.map((section) =>
+          section.id === thread.sectionId
+            ? { ...section, threadCount: section.threadCount + 1 }
+            : section
+        )
+      )
+      setActiveSectionId(thread.sectionId)
+      setShowNewThreadForm(false)
+      setNewThreadTitle("")
+      setNewThreadContent("")
+      setNewThreadTags("")
+      setNewThreadError("")
+      navigateToThread(thread.id)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "发帖失败"
+      setNewThreadError(message)
+
+      if (message === "Unauthorized") {
+        resetSessionState()
+      }
+    } finally {
+      setIsCreatingThread(false)
     }
-
-    setThreads((prev) => [newThread, ...prev])
-    setActiveSectionId(newThreadSectionId)
-    setSelectedThreadId(threadId)
-    setShowNewThreadForm(false)
-    setNewThreadTitle("")
-    setNewThreadContent("")
-    setNewThreadTags("")
-    setNewThreadError("")
   }
 
   const setReplyToFloor = (floorId: string, author: string) => {
@@ -470,8 +866,14 @@ function App() {
     setReplyError("")
   }
 
-  const submitReply = () => {
-    if (!selectedThread || !isLoggedIn) {
+  const submitReply = async () => {
+    if (!selectedThread || !isLoggedIn || !sessionToken) {
+      setReplyError("登录已失效，请重新登录")
+      return
+    }
+
+    if (!canWriteForum) {
+      setReplyError("当前账号为只读观察者，不能回复")
       return
     }
 
@@ -486,83 +888,30 @@ function App() {
       return
     }
 
-    let rejectedByDepth = false
+    setIsSubmittingReply(true)
 
-    setThreads((prev) =>
-      prev.map((thread) => {
-        if (thread.id !== selectedThread.id) {
-          return thread
-        }
-
-        if (!replyTarget) {
-          const floor: Reply = {
-            id: generateId("f"),
-            author: username,
-            authorRole: currentUserRole,
-            content,
-            createdAt: "刚刚",
-            children: [],
-          }
-          return { ...thread, floors: [...thread.floors, floor] }
-        }
-
-        const nextFloors = thread.floors.map((floor) => {
-          if (floor.id !== replyTarget.floorId) {
-            return floor
-          }
-
-          if (!replyTarget.replyId) {
-            const reply: Reply = {
-              id: generateId("r"),
-              author: username,
-              authorRole: currentUserRole,
-              content,
-              createdAt: "刚刚",
-              parentId: floor.id,
-              children: [],
-            }
-            return { ...floor, children: [...floor.children, reply] }
-          }
-
-          const targetIndex = floor.children.findIndex((reply) => reply.id === replyTarget.replyId)
-          if (targetIndex === -1) {
-            rejectedByDepth = true
-            return floor
-          }
-
-          const targetReply = floor.children[targetIndex]
-          const nestedReply: Reply = {
-            id: generateId("r2"),
-            author: username,
-            authorRole: currentUserRole,
-            content,
-            createdAt: "刚刚",
-            parentId: targetReply.id,
-            children: [],
-          }
-
-          const updatedTarget: Reply = {
-            ...targetReply,
-            children: [...targetReply.children, nestedReply],
-          }
-
-          const updatedChildren = [...floor.children]
-          updatedChildren[targetIndex] = updatedTarget
-          return { ...floor, children: updatedChildren }
-        })
-
-        return { ...thread, floors: nextFloors }
+    try {
+      const nextThread = await createForumReply(sessionToken, {
+        threadId: selectedThread.id,
+        floorId: replyTarget?.floorId,
+        replyId: replyTarget?.replyId,
+        content,
       })
-    )
 
-    if (rejectedByDepth) {
-      setReplyError("仅支持2层回复")
-      return
+      patchThreadAcrossFeeds(nextThread)
+      setReplyError("")
+      setReplyContent("")
+      setReplyTarget(null)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "回复失败"
+      setReplyError(message)
+
+      if (message === "Unauthorized") {
+        resetSessionState()
+      }
+    } finally {
+      setIsSubmittingReply(false)
     }
-
-    setReplyError("")
-    setReplyContent("")
-    setReplyTarget(null)
   }
 
   const runMockRound = () => {
@@ -573,63 +922,149 @@ function App() {
     const actorList: AgentKey[] = ["A", "B", "C"]
     const actor = actorList[mockRound % actorList.length]
     const lines: Record<AgentKey, string> = {
-      A: "先确认用户路径：登录 -> 进板块 -> 看帖 -> 回复。",
-      B: "补充数据面：帖子分页和楼层区间读取需要 MCP 参数。",
-      C: "我会把调用日志打到观察面板，保证可追溯。",
+      A: "先确认用户路径：进板块首页 Feed -> 选中帖子 -> 点进详情 -> 再回复。",
+      B: "补充数据面：摘要列表和帖子详情要分开读取，避免首页把正文全捞下来。",
+      C: "我会把看 Feed、开详情、回帖这三个动作都打到观察面板，保证可追溯。",
     }
 
-    setThreads((prev) =>
-      prev.map((thread) => {
-        if (thread.id !== selectedThread.id) {
-          return thread
-        }
+    const nextThread: Thread = {
+      ...selectedThread,
+      floors: [
+        ...selectedThread.floors,
+        {
+          id: generateId("f-mock"),
+          author: `Agent ${actor}`,
+          authorRole: "agent",
+          content: lines[actor],
+          createdAt: "刚刚",
+          children: [],
+        },
+      ],
+    }
 
-        return {
-          ...thread,
-          floors: [
-            ...thread.floors,
-            {
-              id: generateId("f-mock"),
-              author: `Agent ${actor}`,
-              authorRole: "agent",
-              content: lines[actor],
-              createdAt: "刚刚",
-              children: [],
-            },
-          ],
-        }
-      })
-    )
-
-    setActiveAgent(actor)
+    patchThreadAcrossFeeds(nextThread)
     setMockRound((prev) => prev + 1)
   }
 
-  if (!isLoggedIn) {
+  const handleThreadAction = async (action: ThreadAction) => {
+    if (!selectedThread || !sessionToken) {
+      setThreadActionError("登录已失效，请重新登录")
+      return
+    }
+
+    if (!canManageForum) {
+      setThreadActionError("当前账号没有管理权限")
+      return
+    }
+
+    setIsManagingThread(true)
+    setThreadActionError("")
+
+    try {
+      const nextThread = await manageForumThread(sessionToken, selectedThread.id, action)
+      const resolvedThread: Thread = {
+        ...selectedThread,
+        ...nextThread,
+        isPinned:
+          action === "pin" ? true : action === "unpin" ? false : Boolean(nextThread.isPinned),
+        isLocked:
+          action === "lock" ? true : action === "unlock" ? false : Boolean(nextThread.isLocked),
+        reviewStatus:
+          action === "approve"
+            ? "approved"
+            : action === "reject"
+              ? "rejected"
+              : nextThread.reviewStatus,
+        isDeleted:
+          action === "delete"
+            ? true
+            : action === "restore"
+              ? false
+              : Boolean(nextThread.isDeleted),
+      }
+
+      patchThreadAcrossFeeds(resolvedThread)
+      invalidateFeedCaches(resolvedThread.sectionId)
+
+      if (action === "delete") {
+        setSections((prev) =>
+          prev.map((section) =>
+            section.id === resolvedThread.sectionId
+              ? { ...section, threadCount: Math.max(0, section.threadCount - 1) }
+              : section
+          )
+        )
+      }
+
+      if (action === "restore") {
+        setSections((prev) =>
+          prev.map((section) =>
+            section.id === resolvedThread.sectionId
+              ? { ...section, threadCount: section.threadCount + 1 }
+              : section
+          )
+        )
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "管理操作失败"
+      setThreadActionError(message)
+
+      if (message === "Unauthorized") {
+        resetSessionState()
+      }
+    } finally {
+      setIsManagingThread(false)
+    }
+  }
+
+  if (isRestoringSession) {
     return (
       <main className="flex min-h-screen items-center justify-center p-6">
         <Card className="w-full max-w-md bg-card/95 shadow-xl backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-2xl">Agents Forum 登录</CardTitle>
+            <CardTitle>恢复登录中</CardTitle>
+            <CardDescription>正在从 forum-api 校验当前会话。</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center gap-2 text-sm text-muted-foreground">
+            <LoaderCircle className="size-4 animate-spin" />
+            请稍候…
+          </CardContent>
+        </Card>
+      </main>
+    )
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <LoginPage
+        username={username}
+        password={password}
+        loginError={loginError}
+        isSubmitting={isSubmittingLogin}
+        onUsernameChange={setUsername}
+        onPasswordChange={setPassword}
+        onLogin={handleLogin}
+      />
+    )
+  }
+
+  if (forumStatus !== "ready") {
+    return (
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <Card className="w-full max-w-lg bg-card/95 shadow-xl backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>{forumStatus === "loading" ? "论坛数据加载中" : "论坛数据加载失败"}</CardTitle>
             <CardDescription>
-              当前开发账号: <code>admin / 1234</code>
+              {forumStatus === "loading"
+                ? "正在从 forum-api 获取板块信息。"
+                : forumError || "请稍后重试。"}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Input
-              placeholder="用户名"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="密码"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-            {loginError && <p className="text-sm text-destructive">{loginError}</p>}
-            <Button className="w-full" onClick={handleLogin}>
-              登录
+          <CardContent className="flex gap-2">
+            {forumStatus === "error" && <Button onClick={retryBootstrap}>重试</Button>}
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 size-4" />
+              登出 {username}
             </Button>
           </CardContent>
         </Card>
@@ -649,40 +1084,51 @@ function App() {
               <div>
                 <p className="text-lg font-semibold">Agents Forum MVP</p>
                 <p className="text-sm text-muted-foreground">
-                  左侧板块 / 右侧帖子 + Agent 透明观察
+                  左侧板块 / 首页 Feed / 独立帖子详情 + Agent 透明观察
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              {currentUserRole === "super_admin" && (
-                <Badge className="bg-orange-500/90 text-white hover:bg-orange-500">
-                  <ShieldCheck className="mr-1 size-3" />
-                  超级管理员
-                </Badge>
-              )}
+              <RoleBadge role={currentUserRole} />
 
               <Sheet open={isInspectorOpen} onOpenChange={setIsInspectorOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="secondary">
+                  <Button variant="secondary" className="xl:hidden">
                     <ScanSearch className="mr-2 size-4" />
-                    Agent Inspector
+                    Quick Preview
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full sm:max-w-[420px]">
                   <SheetHeader>
-                    <SheetTitle>Agent Inspector</SheetTitle>
+                    <SheetTitle>Agent Quick Preview</SheetTitle>
                     <SheetDescription>
-                      透明观察 AGENTS.md 继承、skills 与个性 rule prompt
+                      移动端快速查看 Claw 数量、在线性和活跃状态
                     </SheetDescription>
                   </SheetHeader>
-                  <InspectorPanel
-                    activeAgent={activeAgent}
-                    onAgentChange={setActiveAgent}
-                    activeProfile={activeProfile}
-                  />
+                  <div className="mt-4">
+                    <QuickPreviewSidebar
+                      activeInstanceId={monitoringInstanceId}
+                      orchestrator={orchestrator}
+                      openclawBridge={openclawBridge}
+                      status={observerStatus}
+                      error={observerError}
+                      onSelectInstance={navigateToMonitoring}
+                      onOpenMonitoring={navigateToMonitoring}
+                      compact
+                    />
+                  </div>
                 </SheetContent>
               </Sheet>
+
+              <Button
+                variant={route.kind === "monitoring" ? "default" : "secondary"}
+                className="hidden xl:inline-flex"
+                onClick={() => navigateToMonitoring(monitoringInstanceId)}
+              >
+                <Workflow className="mr-2 size-4" />
+                完整监控
+              </Button>
 
               <Button variant="outline" onClick={handleLogout}>
                 <LogOut className="mr-2 size-4" />
@@ -692,17 +1138,17 @@ function App() {
           </CardContent>
         </Card>
 
-        <div className="min-h-0 flex-1 overflow-y-auto lg:overflow-hidden">
-          <div className="grid h-full min-h-0 gap-3 lg:grid-cols-[300px_minmax(0,1fr)]">
-            <Card className="flex min-h-0 flex-col bg-card/90 shadow-md backdrop-blur-sm">
+        <div className="min-h-0 flex-1 overflow-y-auto xl:overflow-hidden">
+          <div className="grid h-full min-h-0 gap-3 xl:grid-cols-[300px_minmax(0,1fr)_340px]">
+            <Card className="bg-card/90 shadow-md backdrop-blur-sm xl:flex xl:min-h-0 xl:flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PanelLeft className="size-4" />
                   板块
                 </CardTitle>
-                <CardDescription>切换板块并筛选右侧帖子</CardDescription>
+                <CardDescription>首页保留板块导航，详情页也可直接切回 Feed</CardDescription>
               </CardHeader>
-              <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto">
+              <CardContent className="space-y-2 overflow-visible xl:min-h-0 xl:flex-1 xl:overflow-y-auto">
                 {sections.map((section) => {
                   const isActive = section.id === activeSectionId
                   return (
@@ -719,7 +1165,7 @@ function App() {
                       <div className="mb-1 flex items-center justify-between gap-2">
                         <span className="font-medium">{section.name}</span>
                         <Badge variant={isActive ? "default" : "secondary"}>
-                          {sectionThreadCount(section.id)}
+                          {section.threadCount}
                         </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">{section.description}</p>
@@ -729,23 +1175,56 @@ function App() {
               </CardContent>
             </Card>
 
-            <div className="flex min-h-0 flex-col gap-3">
-              <Card className="flex h-[42vh] min-h-[260px] flex-col bg-card/90 shadow-md backdrop-blur-sm">
+            {route.kind === "feed" ? (
+              <Card className="bg-card/90 shadow-md backdrop-blur-sm lg:flex lg:h-full lg:min-h-0 lg:flex-col">
                 <CardHeader>
-                  <div className="flex items-center justify-between gap-2">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <MessageSquare className="size-4" />
-                      帖子列表
-                    </CardTitle>
-                    <Button size="sm" onClick={() => setShowNewThreadForm((prev) => !prev)}>
-                      <Plus className="mr-1 size-4" />
-                      新建帖子
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <MessageSquare className="size-4" />
+                        {activeSection?.name ?? "帖子 Feed"}
+                      </CardTitle>
+                      <CardDescription>
+                        首页仅展示标题、摘要和元信息，点击后才进入详情加载正文
+                      </CardDescription>
+                    </div>
+                    {canWriteForum ? (
+                      <Button size="sm" onClick={() => setShowNewThreadForm((prev) => !prev)}>
+                        <Plus className="mr-1 size-4" />
+                        新建帖子
+                      </Button>
+                    ) : (
+                      <Badge variant="outline">只读模式</Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                  <div className="grid gap-2 rounded-xl border border-border/80 bg-muted/35 p-3 md:grid-cols-[minmax(0,1fr)_160px_auto]">
+                    <Input
+                      value={feedSearchInput}
+                      placeholder="搜索标题、摘要、标签或作者"
+                      onChange={(event) => setFeedSearchInput(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          submitFeedSearch()
+                        }
+                      }}
+                    />
+                    <select
+                      className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      value={feedSort}
+                      onChange={(event) => handleChangeSort(event.target.value as ThreadSort)}
+                    >
+                      <option value="latest">最新优先</option>
+                      <option value="most_replies">回复最多</option>
+                      <option value="oldest">最早优先</option>
+                    </select>
+                    <Button variant="outline" onClick={submitFeedSearch}>
+                      搜索
                     </Button>
                   </div>
-                  <CardDescription>所有登录用户可发帖，当前演示账号为 admin</CardDescription>
-                </CardHeader>
-                <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto">
-                  {showNewThreadForm && (
+
+                  {showNewThreadForm && canWriteForum && (
                     <div className="rounded-xl border border-border/80 bg-muted/45 p-3">
                       <div className="grid gap-2 md:grid-cols-2">
                         <label className="text-xs text-muted-foreground">
@@ -753,6 +1232,7 @@ function App() {
                           <select
                             className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                             value={newThreadSectionId}
+                            disabled={isCreatingThread}
                             onChange={(event) => setNewThreadSectionId(event.target.value)}
                           >
                             {sections.map((section) => (
@@ -767,6 +1247,7 @@ function App() {
                           <Input
                             placeholder="MVP, 讨论"
                             value={newThreadTags}
+                            disabled={isCreatingThread}
                             onChange={(event) => setNewThreadTags(event.target.value)}
                           />
                         </label>
@@ -775,22 +1256,27 @@ function App() {
                         <Input
                           placeholder="帖子标题（最多120字）"
                           value={newThreadTitle}
+                          disabled={isCreatingThread}
                           onChange={(event) => setNewThreadTitle(event.target.value)}
                         />
                         <Textarea
                           placeholder="帖子正文（最多2000字）"
                           value={newThreadContent}
+                          disabled={isCreatingThread}
                           onChange={(event) => setNewThreadContent(event.target.value)}
                         />
                       </div>
-                      {newThreadError && <p className="mt-2 text-xs text-destructive">{newThreadError}</p>}
+                      {newThreadError && (
+                        <p className="mt-2 text-xs text-destructive">{newThreadError}</p>
+                      )}
                       <div className="mt-2 flex gap-2">
-                        <Button size="sm" onClick={createThread}>
-                          发布帖子
+                        <Button size="sm" disabled={isCreatingThread} onClick={createThread}>
+                          {isCreatingThread ? "发布中..." : "发布帖子"}
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
+                          disabled={isCreatingThread}
                           onClick={() => {
                             setShowNewThreadForm(false)
                             setNewThreadError("")
@@ -802,34 +1288,83 @@ function App() {
                     </div>
                   )}
 
-                  {filteredThreads.map((thread) => {
-                    const isActive = thread.id === selectedThread?.id
-                    return (
+                  {visibleFeedStatus === "loading" && (
+                    <div className="flex h-full min-h-[220px] items-center justify-center text-sm text-muted-foreground">
+                      <LoaderCircle className="mr-2 size-4 animate-spin" />
+                      正在加载当前板块 Feed...
+                    </div>
+                  )}
+
+                  {visibleFeedStatus === "error" && (
+                    <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-left">
+                      <p className="font-medium text-destructive">帖子 Feed 加载失败</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{feedError}</p>
+                      <Button className="mt-3" variant="outline" onClick={retryFeed}>
+                        <RefreshCw className="mr-2 size-4" />
+                        重试
+                      </Button>
+                    </div>
+                  )}
+
+                  {visibleFeedStatus === "ready" && threadSummaries.length === 0 && (
+                    <div className="rounded-xl border border-dashed border-border/80 bg-muted/35 p-6 text-center text-sm text-muted-foreground">
+                      {canWriteForum ? "当前板块还没有帖子，可以先发一条。" : "当前板块还没有帖子。"}
+                    </div>
+                  )}
+
+                  {visibleFeedStatus === "ready" && activeFeed && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                      <span>
+                        共 {activeFeed.total} 条，当前第 {activeFeed.page} /{" "}
+                        {Math.max(1, Math.ceil(activeFeed.total / activeFeed.pageSize))} 页
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={activeFeed.page <= 1}
+                          onClick={() => handleChangeFeedPage(activeFeed.page - 1)}
+                        >
+                          上一页
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!activeFeed.hasMore}
+                          onClick={() => handleChangeFeedPage(activeFeed.page + 1)}
+                        >
+                          下一页
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {visibleFeedStatus === "ready" &&
+                    threadSummaries.map((thread) => (
                       <button
                         key={thread.id}
                         type="button"
-                        onClick={() => {
-                          setSelectedThreadId(thread.id)
-                          setReplyTarget(null)
-                          setReplyContent("")
-                        }}
-                        className={`w-full rounded-xl border p-3 text-left transition ${
-                          isActive
-                            ? "border-primary/70 bg-primary/15"
-                            : "border-border/80 hover:bg-muted/70"
-                        }`}
+                        onClick={() => navigateToThread(thread.id)}
+                        className="w-full rounded-xl border border-border/80 p-4 text-left transition hover:-translate-y-0.5 hover:bg-muted/70"
                       >
-                        <div className="mb-1 flex items-center gap-2">
-                          <p className="font-medium">{thread.title}</p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-base font-semibold">{thread.title}</p>
                           {thread.isPinned && <Badge variant="secondary">置顶</Badge>}
+                          {thread.isLocked && <Badge variant="outline">已锁帖</Badge>}
+                          {thread.reviewStatus !== "approved" && (
+                            <Badge variant="outline">{getReviewStatusLabel(thread.reviewStatus)}</Badge>
+                          )}
+                          <Badge variant="outline">{thread.replyCount} 条回复</Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground">{thread.summary}</p>
-                        <div className="mt-2 flex flex-wrap items-center gap-1">
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                          {thread.summary}
+                        </p>
+                        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                           <RoleBadge role={thread.authorRole} />
-                          <span className="text-xs text-muted-foreground">{thread.author}</span>
-                          <span className="text-xs text-muted-foreground">· {thread.createdAt}</span>
+                          <span>{thread.author}</span>
+                          <span>· {thread.createdAt}</span>
                         </div>
-                        <div className="mt-2 flex flex-wrap gap-1">
+                        <div className="mt-3 flex flex-wrap gap-1">
                           {thread.tags.map((tag) => (
                             <Badge key={`${thread.id}-${tag}`} variant="outline">
                               #{tag}
@@ -837,128 +1372,306 @@ function App() {
                           ))}
                         </div>
                       </button>
-                    )
-                  })}
+                    ))}
                 </CardContent>
               </Card>
-
-              <Card className="flex min-h-0 flex-1 flex-col bg-card/90 shadow-md backdrop-blur-sm">
+            ) : route.kind === "monitoring" ? (
+              <MonitoringPage
+                orchestrator={orchestrator}
+                openclawBridge={openclawBridge}
+                profiles={observerProfiles}
+                status={observerStatus}
+                error={observerError}
+                selectedInstanceId={monitoringInstanceId}
+                canManage={canManageForum}
+                actionStatus={observerActionStatus}
+                actionError={observerActionError}
+                onSelectInstance={navigateToMonitoring}
+                onAction={handleObserverAction}
+                onOpenThread={navigateToThread}
+                onBackToFeed={() => navigateToFeed(activeSectionId)}
+              />
+            ) : (
+              <Card className="bg-card/90 shadow-md backdrop-blur-sm xl:flex xl:h-full xl:min-h-0 xl:flex-col">
                 <CardHeader>
-                  <CardTitle>{selectedThread?.title ?? "暂无帖子"}</CardTitle>
-                  {selectedThread ? (
-                    <CardDescription className="flex flex-wrap items-center gap-2">
-                      <RoleBadge role={selectedThread.authorRole} />
-                      <span>{selectedThread.author}</span>
-                      <span>· {selectedThread.createdAt}</span>
-                    </CardDescription>
-                  ) : (
-                    <CardDescription>请选择帖子</CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent className="min-h-0 flex-1 space-y-4 overflow-y-auto">
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="secondary" onClick={runMockRound}>
-                      <Sparkles className="mr-2 size-4" />
-                      模拟 A/B/C 讨论
-                    </Button>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-3">
-                    {selectedThread?.floors.map((floor, index) => (
-                      <article
-                        key={floor.id}
-                        className="rounded-xl border border-border/80 bg-card/80 p-3"
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="space-y-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="-ml-2"
+                        onClick={() => navigateToFeed(selectedThread?.sectionId ?? activeSectionId)}
                       >
-                        <div className="mb-1 flex items-center justify-between gap-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="font-medium">
-                              {index + 1}F · {floor.author}
-                            </p>
-                            <RoleBadge role={floor.authorRole} />
+                        <ArrowLeft className="size-4" />
+                        返回 Feed
+                      </Button>
+                      <CardTitle>{selectedThread?.title ?? "帖子详情"}</CardTitle>
+                      <CardDescription>
+                        {selectedThread
+                          ? "正文和楼层在进入详情后才加载。"
+                          : visibleDetailStatus === "loading"
+                            ? "正在从 API 拉取帖子正文和楼层。"
+                            : detailError || "请选择帖子。"}
+                      </CardDescription>
+                    </div>
+
+                    {selectedThread && (
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <RoleBadge role={selectedThread.authorRole} />
+                        <span>{selectedThread.author}</span>
+                        <span>· {selectedThread.createdAt}</span>
+                        {selectedThread.isPinned && <Badge variant="secondary">置顶</Badge>}
+                        {selectedThread.isLocked && <Badge variant="outline">已锁帖</Badge>}
+                        <Badge variant="outline">
+                          {getReviewStatusLabel(selectedThread.reviewStatus)}
+                        </Badge>
+                        {selectedThread.isDeleted && <Badge variant="destructive">已删除</Badge>}
+                        <Badge variant="outline">{toThreadSummary(selectedThread).replyCount} 条回复</Badge>
+                      </div>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4 overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                  {visibleDetailStatus === "loading" && (
+                    <div className="flex h-full min-h-[260px] items-center justify-center text-sm text-muted-foreground">
+                      <LoaderCircle className="mr-2 size-4 animate-spin" />
+                      正在加载帖子详情...
+                    </div>
+                  )}
+
+                  {visibleDetailStatus === "error" && (
+                    <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-left">
+                      <p className="font-medium text-destructive">帖子详情加载失败</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{detailError}</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button variant="outline" onClick={retryThread}>
+                          <RefreshCw className="mr-2 size-4" />
+                          重试详情加载
+                        </Button>
+                        <Button variant="secondary" onClick={() => navigateToFeed(activeSectionId)}>
+                          返回 Feed
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {visibleDetailStatus === "ready" && selectedThread && (
+                    <>
+                      {canManageForum && (
+                        <div className="rounded-xl border border-border/80 bg-muted/35 p-3">
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={isManagingThread}
+                              onClick={() =>
+                                handleThreadAction(selectedThread.isPinned ? "unpin" : "pin")
+                              }
+                            >
+                              {selectedThread.isPinned ? "取消置顶" : "置顶"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={isManagingThread || selectedThread.isDeleted}
+                              onClick={() =>
+                                handleThreadAction(selectedThread.isLocked ? "unlock" : "lock")
+                              }
+                            >
+                              {selectedThread.isLocked ? "解锁帖子" : "锁帖"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={isManagingThread}
+                              onClick={() =>
+                                handleThreadAction(selectedThread.isDeleted ? "restore" : "delete")
+                              }
+                            >
+                              {selectedThread.isDeleted ? "恢复帖子" : "删除帖子"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={isManagingThread || selectedThread.isDeleted}
+                              onClick={() => handleThreadAction("approve")}
+                            >
+                              审核通过
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={isManagingThread || selectedThread.isDeleted}
+                              onClick={() => handleThreadAction("reject")}
+                            >
+                              审核驳回
+                            </Button>
                           </div>
-                          <span className="text-xs text-muted-foreground">{floor.createdAt}</span>
+                          {threadActionError && (
+                            <p className="mt-2 text-xs text-destructive">{threadActionError}</p>
+                          )}
                         </div>
-                        <p className="text-sm leading-6">{floor.content}</p>
-                        <div className="mt-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setReplyToFloor(floor.id, floor.author)}
-                          >
-                            回复
+                      )}
+
+                      <div className="flex flex-wrap gap-2">
+                        {canReplyToThread && (
+                          <Button variant="secondary" onClick={runMockRound}>
+                            <Sparkles className="mr-2 size-4" />
+                            模拟 A/B/C 讨论
                           </Button>
-                        </div>
+                        )}
+                        {selectedThread.tags.map((tag) => (
+                          <Badge key={`${selectedThread.id}-${tag}`} variant="outline">
+                            #{tag}
+                          </Badge>
+                        ))}
+                      </div>
 
-                        {floor.children.map((reply) => (
-                          <div
-                            key={reply.id}
-                            className="mt-3 rounded-lg border border-border/80 bg-muted/65 p-3"
+                      <Separator />
+
+                      <div className="space-y-3">
+                        {selectedThread.isDeleted && (
+                          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-muted-foreground">
+                            该帖子已被删除，当前详情页保留给管理员执行恢复或审计。
+                          </div>
+                        )}
+                        {selectedThread.floors.length === 0 && !selectedThread.isDeleted && (
+                          <div className="rounded-xl border border-dashed border-border/80 bg-muted/35 p-4 text-sm text-muted-foreground">
+                            当前帖子还没有楼层内容。
+                          </div>
+                        )}
+                        {selectedThread.floors.map((floor, index) => (
+                          <article
+                            key={floor.id}
+                            className="rounded-xl border border-border/80 bg-card/80 p-3"
                           >
-                            <div className="flex flex-wrap items-center gap-2">
-                              <p className="text-xs font-semibold">回复 · {reply.author}</p>
-                              <RoleBadge role={reply.authorRole} />
-                              <span className="text-xs text-muted-foreground">{reply.createdAt}</span>
+                            <div className="mb-1 flex items-center justify-between gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="font-medium">
+                                  {index + 1}F · {floor.author}
+                                </p>
+                                <RoleBadge role={floor.authorRole} />
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {floor.createdAt}
+                              </span>
                             </div>
-                            <p className="mt-1 text-sm">{reply.content}</p>
-                            <div className="mt-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setReplyToReply(floor.id, reply.id, reply.author)}
-                              >
-                                回复
-                              </Button>
-                            </div>
+                            <p className="text-sm leading-6">{floor.content}</p>
+                            {canReplyToThread && (
+                              <div className="mt-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setReplyToFloor(floor.id, floor.author)}
+                                >
+                                  回复
+                                </Button>
+                              </div>
+                            )}
 
-                            {reply.children.map((nested) => (
+                            {floor.children.map((reply) => (
                               <div
-                                key={nested.id}
-                                className="mt-2 rounded-lg border border-border/80 bg-background/85 p-2"
+                                key={reply.id}
+                                className="mt-3 rounded-lg border border-border/80 bg-muted/65 p-3"
                               >
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <p className="text-xs font-semibold">
-                                    回复的回复 · {nested.author}
-                                  </p>
-                                  <RoleBadge role={nested.authorRole} />
+                                  <p className="text-xs font-semibold">回复 · {reply.author}</p>
+                                  <RoleBadge role={reply.authorRole} />
+                                  <span className="text-xs text-muted-foreground">
+                                    {reply.createdAt}
+                                  </span>
                                 </div>
-                                <p className="text-sm">{nested.content}</p>
+                                <p className="mt-1 text-sm">{reply.content}</p>
+                                {canReplyToThread && (
+                                  <div className="mt-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() =>
+                                        setReplyToReply(floor.id, reply.id, reply.author)
+                                      }
+                                    >
+                                      回复
+                                    </Button>
+                                  </div>
+                                )}
+
+                                {reply.children.map((nested) => (
+                                  <div
+                                    key={nested.id}
+                                    className="mt-2 rounded-lg border border-border/80 bg-background/85 p-2"
+                                  >
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <p className="text-xs font-semibold">
+                                        回复的回复 · {nested.author}
+                                      </p>
+                                      <RoleBadge role={nested.authorRole} />
+                                    </div>
+                                    <p className="text-sm">{nested.content}</p>
+                                  </div>
+                                ))}
                               </div>
                             ))}
-                          </div>
+                          </article>
                         ))}
-                      </article>
-                    ))}
-                  </div>
+                      </div>
 
-                  <Separator />
+                      <Separator />
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium">发布回复</p>
-                      {replyTarget && (
-                        <Button size="sm" variant="outline" onClick={cancelReplyTarget}>
-                          取消定向回复
-                        </Button>
-                      )}
-                    </div>
-                    {replyTarget && (
-                      <p className="text-xs text-muted-foreground">
-                        正在回复 <span className="font-medium">{replyTarget.author}</span>
-                        {replyTarget.replyId ? "（二级回复）" : "（楼层回复）"}
-                      </p>
-                    )}
-                    <Textarea
-                      value={replyContent}
-                      placeholder={replyTarget ? "输入回复内容..." : "输入楼层内容..."}
-                      onChange={(event) => setReplyContent(event.target.value)}
-                    />
-                    {replyError && <p className="text-xs text-destructive">{replyError}</p>}
-                    <Button onClick={submitReply}>发布回复</Button>
-                  </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-medium">发布回复</p>
+                          {replyTarget && canReplyToThread && (
+                            <Button size="sm" variant="outline" onClick={cancelReplyTarget}>
+                              取消定向回复
+                            </Button>
+                          )}
+                        </div>
+                        {replyTarget && canReplyToThread && (
+                          <p className="text-xs text-muted-foreground">
+                            正在回复 <span className="font-medium">{replyTarget.author}</span>
+                            {replyTarget.replyId ? "（二级回复）" : "（楼层回复）"}
+                          </p>
+                        )}
+                        {canReplyToThread ? (
+                          <>
+                            <Textarea
+                              value={replyContent}
+                              placeholder={replyTarget ? "输入回复内容..." : "输入楼层内容..."}
+                              disabled={isSubmittingReply}
+                              onChange={(event) => setReplyContent(event.target.value)}
+                            />
+                            {replyError && <p className="text-xs text-destructive">{replyError}</p>}
+                            <Button disabled={isSubmittingReply} onClick={submitReply}>
+                              {isSubmittingReply ? "发布中..." : "发布回复"}
+                            </Button>
+                          </>
+                        ) : (
+                          <div className="rounded-lg border border-border/80 bg-muted/50 p-3 text-sm text-muted-foreground">
+                            {selectedThread.isDeleted
+                              ? "该帖子已删除，不能继续回复。"
+                              : selectedThread.isLocked
+                                ? "该帖子已锁帖，暂不允许继续回复。"
+                                : "当前账号为观察者，只能阅读和查看审计，不能发帖或回复。"}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
+            )}
+
+            <div className="hidden xl:block xl:min-h-0">
+              <QuickPreviewSidebar
+                activeInstanceId={monitoringInstanceId}
+                orchestrator={orchestrator}
+                openclawBridge={openclawBridge}
+                status={observerStatus}
+                error={observerError}
+                onSelectInstance={navigateToMonitoring}
+                onOpenMonitoring={navigateToMonitoring}
+              />
             </div>
           </div>
         </div>

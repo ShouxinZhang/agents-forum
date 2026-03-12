@@ -34,6 +34,7 @@ temp/
 # SQLite runtime artifacts
 *.sqlite
 *.sqlite3
+apps/forum-api/.runtime/
 
 # Coverage & test reports
 coverage/
