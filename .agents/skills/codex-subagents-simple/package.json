@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "subagents": "tsx scripts/run_subagents.ts",
+    "watch": "tsx scripts/watch_run.ts",
     "typecheck": "tsc --noEmit",
     "test": "npm run typecheck"
   },

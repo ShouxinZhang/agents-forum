@@ -1,0 +1,70 @@
+{
+  "task": "Finish the remaining feasible work for Phase 2, Phase 3, and Phase 3.5 of the OpenClaw bridge roadmap by making observer views native-first, tightening native runtime lifecycle metadata, and closing the YOLO acceptance gap with a stricter runtime gate.",
+  "acceptanceCriteria": [
+    "Observer/bridge/UI make it explicit which state comes from OpenClaw native runtime versus forum-domain supplement, and Quick Preview plus Monitoring prefer native activity for online and active judgement.",
+    "Native runtime backend exposes clearer lifecycle mode and native-driven scheduling metadata so the scheduler is visibly a compatibility layer instead of the only truth source.",
+    "YOLO mode has a stricter runtime gate or verification path that proves enable, burst, expire, and recovery behaviour, and the roadmap document is updated to match reality."
+  ],
+  "sharedContextFiles": [
+    "AGENTS.md",
+    "docs/dev_plan/openclaw-multi-bot-forum-plan.md"
+  ],
+  "subagents": [
+    {
+      "name": "native-observer",
+      "mission": "Complete the observer-side Phase 2 handoff. Make OpenClaw native runtime the primary source for presence/activity in the bridge and UI, label native-vs-forum provenance explicitly, and make the monitoring timeline clearly prefer native activity while retaining forum fields as domain supplement.",
+      "ownedPaths": [
+        "apps/forum-api/src/modules/openclaw-bridge/service.mjs",
+        "apps/forum-api/src/modules/agent-observer/routes.mjs",
+        "apps/forum-web/src/modules/agent-observer/types.ts",
+        "apps/forum-web/src/modules/agent-observer/format.ts",
+        "apps/forum-web/src/modules/agent-observer/components/quick-preview-sidebar.tsx",
+        "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx"
+      ],
+      "readFiles": [
+        "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+        "apps/forum-web/src/modules/agent-observer/api.ts"
+      ],
+      "extraInstructions": [
+        "Keep the API and UI changes coherent end-to-end.",
+        "Do not weaken existing moderator actions or auth behaviour.",
+        "Bias toward adding explicit provenance and native-first derived fields instead of deleting domain-specific fields."
+      ]
+    },
+    {
+      "name": "native-runtime",
+      "mission": "Tighten the Phase 3 backend lifecycle contract. Improve the orchestrator and native runner so native session/runtime metadata is more explicit, native scheduling mode is visible, and forum-side scheduling is clearly treated as a compatibility layer driving native turns rather than an opaque black box.",
+      "ownedPaths": [
+        "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+        "apps/forum-api/src/modules/openclaw-orchestrator/native-runner.mjs"
+      ],
+      "readFiles": [
+        "apps/forum-api/src/modules/openclaw-bridge/service.mjs",
+        "apps/forum-api/src/modules/openclaw-orchestrator/store.mjs",
+        "apps/forum-api/src/modules/agent-observer/routes.mjs"
+      ],
+      "extraInstructions": [
+        "Prefer additive metadata and clearer lifecycle signals over risky architectural rewrites.",
+        "Keep OpenClaw turns bound to the intended local runtime/workspace and make that obvious in code or metadata.",
+        "Do not modify frontend files in this subtask."
+      ]
+    },
+    {
+      "name": "yolo-closure",
+      "mission": "Close the remaining Phase 3.5 gap. Extend the runtime gate or verification path so YOLO mode has stricter evidence for enable, burst, expiry, and recovery, and update the roadmap document to reflect the new acceptance coverage accurately.",
+      "ownedPaths": [
+        "scripts/openclaw/runtime-gate.mjs",
+        "docs/dev_plan/openclaw-multi-bot-forum-plan.md"
+      ],
+      "readFiles": [
+        "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+        "apps/forum-api/src/modules/agent-observer/routes.mjs"
+      ],
+      "extraInstructions": [
+        "Keep the gate script executable from the current repo without asking the user to do manual setup.",
+        "Favor pragmatic verification that can be rerun locally over plan-only wording.",
+        "Update the roadmap only for what your code actually makes true."
+      ]
+    }
+  ]
+}

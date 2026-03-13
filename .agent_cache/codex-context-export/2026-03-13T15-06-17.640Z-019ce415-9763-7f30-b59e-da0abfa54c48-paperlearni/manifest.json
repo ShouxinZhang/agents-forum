@@ -1,0 +1,33 @@
+{
+  "exportedAt": "2026-03-13T15:06:17.642Z",
+  "repoRoot": "/home/wudizhe001/Documents/GitHub/agents-forum",
+  "codexHome": "/home/wudizhe001/.codex",
+  "selection": {
+    "sessionId": "019ce415-9763-7f30-b59e-da0abfa54c48",
+    "threadName": "在 paperLearning notes 中新增 2512.24601",
+    "updatedAt": "2026-03-12T22:10:45.001325948Z",
+    "latestMode": true
+  },
+  "sources": {
+    "sessionIndexPath": "/home/wudizhe001/.codex/session_index.jsonl",
+    "historyPath": "/home/wudizhe001/.codex/history.jsonl",
+    "transcriptPath": "/home/wudizhe001/.codex/sessions/2026/03/13/rollout-2026-03-13T06-05-46-019ce415-9763-7f30-b59e-da0abfa54c48.jsonl",
+    "archivedPath": ""
+  },
+  "exportedFiles": {
+    "outputDir": "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-context-export/2026-03-13T15-06-17.640Z-019ce415-9763-7f30-b59e-da0abfa54c48-paperlearni",
+    "rawDir": "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-context-export/2026-03-13T15-06-17.640Z-019ce415-9763-7f30-b59e-da0abfa54c48-paperlearni/raw",
+    "handoffPath": "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-context-export/2026-03-13T15-06-17.640Z-019ce415-9763-7f30-b59e-da0abfa54c48-paperlearni/handoff.md",
+    "copiedKeyFiles": [
+      "/home/wudizhe001/Documents/GitHub/agents-forum/.agents/skills/codex-context-export/SKILL.md",
+      "/home/wudizhe001/Documents/GitHub/agents-forum/.agents/skills/codex-context-export/scripts/export_context.mjs"
+    ],
+    "copiedArtifacts": [],
+    "copiedSubagentRuns": [
+      "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple/phase4-5-context-pass"
+    ]
+  },
+  "missing": [
+    "archived session transcript"
+  ]
+}

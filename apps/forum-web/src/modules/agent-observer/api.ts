@@ -25,7 +25,14 @@ export async function fetchObserverDashboard(signal?: AbortSignal): Promise<Obse
 export async function runObserverOrchestratorAction(
   token: string,
   action: string,
-  instanceId?: string
+  instanceId?: string,
+  options?: {
+    durationMs?: number
+    reason?: string
+    approvalId?: string
+    note?: string
+    threadId?: string
+  }
 ): Promise<ObserverDashboard> {
   const response = await fetch(buildApiPath("/observer/orchestrator/actions"), {
     method: "POST",
@@ -36,6 +43,11 @@ export async function runObserverOrchestratorAction(
     body: JSON.stringify({
       action,
       instanceId,
+      durationMs: options?.durationMs,
+      reason: options?.reason,
+      approvalId: options?.approvalId,
+      note: options?.note,
+      threadId: options?.threadId,
     }),
   })
 

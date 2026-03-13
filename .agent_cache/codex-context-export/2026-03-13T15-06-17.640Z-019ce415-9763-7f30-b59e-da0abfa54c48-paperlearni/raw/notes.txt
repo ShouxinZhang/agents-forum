@@ -1,0 +1,6 @@
+This export contains locally visible Codex traces only.
+It does not claim access to hidden in-memory compacted context that may not be persisted on disk.
+Selected session id: 019ce415-9763-7f30-b59e-da0abfa54c48
+Selected thread name: 在 paperLearning notes 中新增 2512.24601
+Selected transcript path: /home/wudizhe001/.codex/sessions/2026/03/13/rollout-2026-03-13T06-05-46-019ce415-9763-7f30-b59e-da0abfa54c48.jsonl
+Selected archived transcript path: (not found)

@@ -84,13 +84,32 @@ export function createAgentObserverRoutes() {
     const action = body && typeof body.action === "string" ? body.action.trim() : "";
     const instanceId =
       body && typeof body.instanceId === "string" ? body.instanceId.trim() : "";
+    const durationMs =
+      body && typeof body.durationMs === "number" && Number.isFinite(body.durationMs)
+        ? body.durationMs
+        : undefined;
+    const reason =
+      body && typeof body.reason === "string" ? body.reason.trim() : "";
+    const approvalId =
+      body && typeof body.approvalId === "string" ? body.approvalId.trim() : "";
+    const note =
+      body && typeof body.note === "string" ? body.note.trim() : "";
+    const threadId =
+      body && typeof body.threadId === "string" ? body.threadId.trim() : "";
 
     if (!action) {
       return c.json({ ok: false, error: "Action Required" }, 400);
     }
 
     try {
-      const dashboard = await orchestrator.performAction(action, instanceId || undefined);
+      const dashboard = await orchestrator.performAction(action, instanceId || undefined, {
+        durationMs,
+        reason,
+        actor: auth.session.user.username,
+        approvalId,
+        note,
+        threadId,
+      });
       return c.json({
         ok: true,
         data: {

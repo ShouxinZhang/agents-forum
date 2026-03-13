@@ -1,12 +1,12 @@
-import { ArrowLeft, Bot, Clock3, ExternalLink, LoaderCircle, PauseCircle, PlayCircle, RefreshCw, ShieldAlert, TimerReset, Workflow } from "lucide-react"
+import { ArrowLeft, Bot, Clock3, ExternalLink, Flame, LoaderCircle, PauseCircle, PlayCircle, RefreshCw, ShieldAlert, TimerReset, Workflow } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { formatObserverDuration, formatObserverTimestamp, getInstanceStatusLabel, getPresenceLabel, getStatusTone } from "@/modules/agent-observer/format"
-import type { AgentProfile, AgentProfiles, OpenClawBridge, OpenClawBridgeAgent, OpenClawBridgeHome, OpenClawInstance, OpenClawOrchestrator } from "@/modules/agent-observer/types"
+import { formatObserverDuration, formatObserverTimestamp, getInstanceStatusLabel, getNativePresenceLabel, getPresenceLabel, getPresenceSourceLabel, getStatusTone } from "@/modules/agent-observer/format"
+import type { AgentProfile, AgentProfiles, OpenClawBridge, OpenClawBridgeAgent, OpenClawBridgeHome, OpenClawBridgeInstanceView, OpenClawInstance, OpenClawOrchestrator, OpenClawReplyContextTrace } from "@/modules/agent-observer/types"
 
 type MonitoringPageProps = {
   orchestrator?: OpenClawOrchestrator
@@ -19,7 +19,17 @@ type MonitoringPageProps = {
   actionStatus: "idle" | "loading" | "error"
   actionError: string
   onSelectInstance: (instanceId: string) => void
-  onAction: (action: string, instanceId?: string) => void
+  onAction: (
+    action: string,
+    instanceId?: string,
+    options?: {
+      durationMs?: number
+      reason?: string
+      approvalId?: string
+      note?: string
+      threadId?: string
+    }
+  ) => void
   onOpenThread: (threadId: string) => void
   onBackToFeed: () => void
 }
@@ -71,6 +81,75 @@ function getSelectedNativeAgents(
   }
 
   return bridge.agents.filter((agent) => agent.linkedInstanceId === instance.id)
+}
+
+function getSelectedBridgeView(
+  bridge: OpenClawBridge | undefined,
+  instance: OpenClawInstance | null
+): OpenClawBridgeInstanceView | null {
+  if (!bridge || !instance) {
+    return null
+  }
+
+  return bridge.instanceViews.find((view) => view.instanceId === instance.id) ?? null
+}
+
+function getReplyContextTrace(instance: OpenClawInstance | null): OpenClawReplyContextTrace | null {
+  if (!instance) {
+    return null
+  }
+
+  return instance.replyContextTrace ?? instance.latestReplyTrace ?? instance.replyContext ?? null
+}
+
+function getReplyContextSourceLabel(source: OpenClawReplyContextTrace["source"]) {
+  switch (source) {
+    case "openclaw-native":
+    case "native":
+      return "native 生成"
+    case "mixed":
+      return "native + forum"
+    case "forum":
+    case "local-fallback":
+      return "forum 兜底"
+    case "none":
+      return "暂无 trace"
+    default:
+      return source
+  }
+}
+
+function getReplyContextWhy(trace: OpenClawReplyContextTrace) {
+  return trace.whyThisReply || trace.promptSummary || trace.basis.join(" / ") || "暂无说明"
+}
+
+function getReplyContextReplySummary(trace: OpenClawReplyContextTrace) {
+  if (trace.replySummary) {
+    return trace.replySummary
+  }
+
+  if (trace.replyHighlights.length === 0) {
+    return "暂无回复摘要"
+  }
+
+  return trace.replyHighlights
+    .slice(0, 2)
+    .map((highlight) => `${highlight.author || "匿名"}: ${highlight.text}`)
+    .join(" / ")
+}
+
+function getReplyContextMemoryHits(trace: OpenClawReplyContextTrace) {
+  if (trace.memoryHits && trace.memoryHits.length > 0) {
+    return trace.memoryHits
+  }
+
+  return trace.memoryHighlights.map((summary, index) => ({
+    id: `memory-${index}`,
+    label: `memory ${index + 1}`,
+    source: "workspace",
+    summary,
+    updatedAt: "",
+  }))
 }
 
 function MonitoringList({
@@ -134,6 +213,18 @@ export function MonitoringPage({
   const selectedProfile = getInstanceProfile(profiles, selectedInstance)
   const selectedNativeHome = getSelectedNativeHome(openclawBridge, selectedInstance)
   const selectedNativeAgents = getSelectedNativeAgents(openclawBridge, selectedInstance)
+  const selectedBridgeView = getSelectedBridgeView(openclawBridge, selectedInstance)
+  const selectedReplyContext = getReplyContextTrace(selectedInstance)
+  const selectedReplyMemoryHits = selectedReplyContext
+    ? getReplyContextMemoryHits(selectedReplyContext)
+    : []
+  const selectedApprovals = (orchestrator?.approvals ?? []).filter(
+    (approval) =>
+      approval.status === "pending" &&
+      selectedInstance &&
+      (approval.instanceId === selectedInstance.id ||
+        approval.botUsername === selectedInstance.botUsername)
+  )
   const primaryNativeAgent = selectedNativeAgents[0] ?? null
   const globalNativeHome = openclawBridge?.homes.find((home) => home.source === "user-global") ?? null
   const globalNativeAgents = openclawBridge?.agents.filter((agent) => !agent.linkedInstanceId) ?? []
@@ -190,10 +281,16 @@ export function MonitoringPage({
                 </Badge>
                 <Badge variant="outline">总实例 {orchestrator.summary.total}</Badge>
                 <Badge variant="outline">在线 {orchestrator.summary.online}</Badge>
-                <Badge variant="outline">活跃 {orchestrator.summary.active}</Badge>
+                <Badge variant="outline">调度在线 {orchestrator.summary.schedulerOnline}</Badge>
+                <Badge variant="outline">活跃 {orchestrator.summary.observedActive}</Badge>
                 {openclawBridge && (
                   <Badge variant={openclawBridge.status === "connected" ? "secondary" : "outline"}>
                     Native {openclawBridge.status}
+                  </Badge>
+                )}
+                {orchestrator?.yoloMode.enabled && (
+                  <Badge variant="destructive">
+                    YOLO {formatObserverDuration(orchestrator.yoloMode.remainingMs)}
                   </Badge>
                 )}
               </div>
@@ -239,6 +336,9 @@ export function MonitoringPage({
                           {selectedInstance.botUsername} · {getPresenceLabel(selectedInstance.online)} ·{" "}
                           {selectedInstance.canWrite ? "可写" : "只读"}
                         </CardDescription>
+                        <p className="text-xs text-muted-foreground">
+                          在线来源: {getPresenceSourceLabel(selectedInstance.onlineSource)} · 活跃来源: {getPresenceSourceLabel(selectedInstance.activitySource)}
+                        </p>
                       </div>
                     </div>
 
@@ -252,6 +352,21 @@ export function MonitoringPage({
                 </CardHeader>
 
                 <CardContent className="space-y-4">
+                  {orchestrator?.yoloMode.enabled && (
+                    <div className="rounded-2xl border border-orange-500/30 bg-orange-500/10 p-4 text-sm text-orange-950">
+                      <div className="flex items-center gap-2 font-medium">
+                        <Flame className="size-4" />
+                        YOLO Mode 已开启
+                      </div>
+                      <p className="mt-2">
+                        剩余 {formatObserverDuration(orchestrator.yoloMode.remainingMs)}，已放开 quota / cooldown / 本地安全检查。
+                      </p>
+                      <p className="mt-1 text-xs">
+                        startedBy: {orchestrator.yoloMode.startedBy || "未知"} · reason: {orchestrator.yoloMode.reason || "未填写"}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
                     <div className="rounded-2xl border border-border/70 bg-muted/35 p-3">
                       <p className="text-xs text-muted-foreground">当前步骤</p>
@@ -272,7 +387,7 @@ export function MonitoringPage({
                     <div className="rounded-2xl border border-border/70 bg-muted/35 p-3">
                       <p className="text-xs text-muted-foreground">Native 最近活动</p>
                       <p className="mt-2 text-sm font-medium">
-                        {formatObserverTimestamp(primaryNativeAgent?.updatedAt || "")}
+                        {formatObserverTimestamp(selectedBridgeView?.nativeUpdatedAt || selectedInstance.nativeHeartbeatAt || primaryNativeAgent?.updatedAt || "")}
                       </p>
                     </div>
                     <div className="rounded-2xl border border-border/70 bg-muted/35 p-3">
@@ -297,8 +412,15 @@ export function MonitoringPage({
                         <p>最后切换: {formatObserverTimestamp(selectedInstance.lastTransitionAt)}</p>
                         <p>最后决策: {selectedInstance.lastDecision || "暂无"}</p>
                         <p>最近摘要: {selectedInstance.lastSummary || "暂无"}</p>
+                        <p>主时间线: {selectedInstance.primaryTimelineSource === "native" ? "native transcript" : selectedInstance.primaryTimelineSource === "forum" ? "forum workflow" : "暂无"}</p>
                         <p>native session: {primaryNativeAgent?.latestSessionId || "暂无"}</p>
+                        <p>native 状态: {getNativePresenceLabel(selectedInstance.nativeStatus)}</p>
+                        <p>native 运行次数: {selectedInstance.nativeRuntime.runCount}</p>
+                        <p>native 连续失败: {selectedInstance.nativeRuntime.consecutiveFailures}</p>
                         {selectedInstance.lastError && <p className="text-destructive">错误: {selectedInstance.lastError}</p>}
+                        {selectedInstance.nativeLastError && (
+                          <p className="text-destructive">native 错误: {selectedInstance.nativeLastError}</p>
+                        )}
                       </div>
                     </div>
 
@@ -329,6 +451,7 @@ export function MonitoringPage({
                       <Separator className="my-4" />
                       <div className="space-y-2 text-xs text-muted-foreground">
                         <p>今日写入配额: {selectedInstance.quota.used}/{selectedInstance.quota.limit}</p>
+                        <p>YOLO 写入次数: {selectedInstance.quota.yoloReplies ?? 0}</p>
                         <p>Cooldown: {formatObserverDuration(selectedInstance.quota.remainingMs)}</p>
                         <p>待审批: {selectedInstance.quota.pendingApprovals}</p>
                         <p>循环次数: {selectedInstance.stats.cycles}</p>
@@ -336,6 +459,156 @@ export function MonitoringPage({
                         <p>拦截次数: {selectedInstance.stats.blocked}</p>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-border/70 bg-muted/25 p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Bot className="size-4" />
+                        Why This Reply
+                      </div>
+                      {selectedReplyContext && (
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="secondary">
+                            {getReplyContextSourceLabel(selectedReplyContext.source)}
+                          </Badge>
+                          {selectedReplyContext.generationSource && (
+                            <Badge variant="outline">
+                              draft {selectedReplyContext.generationSource}
+                            </Badge>
+                          )}
+                          <Badge variant="outline">
+                            final{" "}
+                            {selectedReplyContext.finalSource ||
+                              selectedReplyContext.generationSource ||
+                              selectedReplyContext.source}
+                          </Badge>
+                          <Badge variant="outline">
+                            memory {selectedReplyMemoryHits.length}
+                          </Badge>
+                          {selectedReplyContext.posted && <Badge variant="secondary">已发布</Badge>}
+                        </div>
+                      )}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      这里聚焦这次回帖看过什么上下文、为什么这么回，以及最终发布文案的来源。
+                    </p>
+
+                    {selectedReplyContext ? (
+                      selectedReplyContext.updatedAt || selectedReplyContext.createdAt ? (
+                        <div className="mt-4 space-y-3">
+                          <div className="grid gap-3 xl:grid-cols-2">
+                            <div className="rounded-2xl border border-border/70 bg-background/60 p-4 text-sm">
+                              <p className="text-xs text-muted-foreground">为什么这样回复</p>
+                              <p className="mt-2 font-medium">
+                                persona: {selectedReplyContext.persona || "暂无 persona"}
+                              </p>
+                              <p className="mt-2 leading-6 text-foreground/90">
+                                {getReplyContextWhy(selectedReplyContext)}
+                              </p>
+                              {selectedReplyContext.basis.length > 0 && (
+                                <p className="mt-3 text-xs text-muted-foreground">
+                                  basis: {selectedReplyContext.basis.join(" / ")}
+                                </p>
+                              )}
+                              {selectedReplyContext.contextSources.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {selectedReplyContext.contextSources.map((item) => (
+                                    <Badge key={item} variant="outline">
+                                      {item}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="rounded-2xl border border-border/70 bg-background/60 p-4 text-sm">
+                              <p className="text-xs text-muted-foreground">它读到的上下文</p>
+                              <p className="mt-2 font-medium">
+                                {selectedReplyContext.threadTitle || "暂无帖子标题"}
+                              </p>
+                              <div className="mt-3 space-y-2 text-xs text-muted-foreground">
+                                <p>
+                                  thread:{" "}
+                                  {selectedReplyContext.threadSummary ||
+                                    selectedReplyContext.rootPostSummary ||
+                                    selectedReplyContext.rootExcerpt ||
+                                    "暂无主题摘要"}
+                                </p>
+                                <p>
+                                  target:{" "}
+                                  {selectedReplyContext.target?.summary ||
+                                    selectedReplyContext.targetSummary ||
+                                    "无明确 target"}
+                                </p>
+                                <p>replies: {getReplyContextReplySummary(selectedReplyContext)}</p>
+                                <p>threadId: {selectedReplyContext.threadId || "暂无"}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {selectedReplyMemoryHits.length > 0 && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Memory Hits</p>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {selectedReplyMemoryHits.slice(0, 4).map((memoryHit) => (
+                                  <div
+                                    key={memoryHit.id}
+                                    className="max-w-full rounded-xl border border-border/60 bg-background/70 px-3 py-2 text-xs"
+                                  >
+                                    <p className="font-medium">
+                                      {memoryHit.label || memoryHit.source || "memory"}
+                                    </p>
+                                    <p className="mt-1 text-muted-foreground">
+                                      {memoryHit.summary}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="grid gap-3 md:grid-cols-2">
+                            {selectedReplyContext.nativeDraft &&
+                              selectedReplyContext.nativeDraft !==
+                                selectedReplyContext.finalReply && (
+                                <div className="rounded-2xl border border-border/70 bg-background/60 p-4 text-sm">
+                                  <p className="text-xs text-muted-foreground">Native Draft</p>
+                                  <p className="mt-2 whitespace-pre-wrap leading-6 text-foreground/90">
+                                    {selectedReplyContext.nativeDraft}
+                                  </p>
+                                </div>
+                              )}
+
+                            <div className="rounded-2xl border border-border/70 bg-background/60 p-4 text-sm">
+                              <p className="text-xs text-muted-foreground">Final Reply</p>
+                              <p className="mt-2 whitespace-pre-wrap font-medium leading-6 text-foreground">
+                                {selectedReplyContext.finalReply ||
+                                  selectedReplyContext.seedReply ||
+                                  "暂无最终文案"}
+                              </p>
+                              <p className="mt-3 text-xs text-muted-foreground">
+                                updated:{" "}
+                                {formatObserverTimestamp(
+                                  selectedReplyContext.updatedAt ||
+                                    selectedReplyContext.createdAt ||
+                                    ""
+                                )}{" "}
+                                · posted {selectedReplyContext.posted ? "yes" : "no"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-4 rounded-2xl border border-dashed border-border/70 bg-background/40 p-4 text-sm text-muted-foreground">
+                          当前实例还没有结构化 reply trace。native 最终生成切过来后，这里会显示它读过的上下文、memory 命中与最终发布文案。
+                        </div>
+                      )
+                    ) : (
+                      <div className="mt-4 rounded-2xl border border-dashed border-border/70 bg-background/40 p-4 text-sm text-muted-foreground">
+                        当前实例还没有结构化 reply trace。native 最终生成切过来后，这里会显示它读过的上下文、memory 命中与最终发布文案。
+                      </div>
+                    )}
                   </div>
 
                   {canManage && (
@@ -359,6 +632,24 @@ export function MonitoringPage({
                         size="sm"
                         variant="outline"
                         disabled={actionStatus === "loading"}
+                        onClick={() => onAction("run_instance_once", selectedInstance.id)}
+                      >
+                        <TimerReset className="mr-2 size-4" />
+                        实例跑一轮
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={actionStatus === "loading"}
+                        onClick={() => onAction("queue_instance_approval", selectedInstance.id)}
+                      >
+                        <ShieldAlert className="mr-2 size-4" />
+                        生成待审批草稿
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={actionStatus === "loading"}
                         onClick={() => onAction("run_once")}
                       >
                         <TimerReset className="mr-2 size-4" />
@@ -377,11 +668,120 @@ export function MonitoringPage({
                         )}
                         {orchestrator?.paused ? "恢复全局调度" : "暂停全局调度"}
                       </Button>
+                      {orchestrator?.yoloMode.enabled ? (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={actionStatus === "loading"}
+                          onClick={() => onAction("stop_yolo", undefined, { reason: "manual_stop" })}
+                        >
+                          <Flame className="mr-2 size-4" />
+                          关闭 YOLO
+                        </Button>
+                      ) : (
+                        <>
+                          {[5, 15, 30].map((minutes) => (
+                            <Button
+                              key={minutes}
+                              size="sm"
+                              variant="outline"
+                              disabled={actionStatus === "loading"}
+                              onClick={() =>
+                                onAction("start_yolo", undefined, {
+                                  durationMs: minutes * 60 * 1000,
+                                  reason: `ui_${minutes}m`,
+                                })
+                              }
+                            >
+                              <Flame className="mr-2 size-4" />
+                              YOLO {minutes}m
+                            </Button>
+                          ))}
+                        </>
+                      )}
                     </div>
                   )}
 
                   {actionError && (
                     <p className="text-sm text-destructive">{actionError}</p>
+                  )}
+
+                  {selectedApprovals.length > 0 && (
+                    <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-medium">Pending Approvals</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            这些回复草稿已经由 OpenClaw native 生成，等待运营确认后发布。
+                          </p>
+                        </div>
+                        <Badge variant="outline">{selectedApprovals.length} pending</Badge>
+                      </div>
+                      <div className="mt-3 space-y-3">
+                        {selectedApprovals.slice(0, 3).map((approval) => (
+                          <div
+                            key={approval.id}
+                            className="rounded-2xl border border-border/70 bg-background/70 p-4"
+                          >
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Badge variant="outline">{approval.botUsername}</Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {formatObserverTimestamp(approval.timestamp)}
+                              </span>
+                              {approval.threadTitle && (
+                                <Badge variant="outline">{approval.threadTitle}</Badge>
+                              )}
+                            </div>
+                            <p className="mt-3 text-sm font-medium leading-6">
+                              {approval.replyContextTrace?.whyThisReply ||
+                                approval.whyThisReply ||
+                                "待审批草稿"}
+                            </p>
+                            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-foreground/90">
+                              {approval.content}
+                            </p>
+                            <p className="mt-2 text-xs text-muted-foreground">
+                              memory:{" "}
+                              {approval.replyContextTrace?.memoryApplied ||
+                                approval.memoryApplied ||
+                                "暂无"}
+                            </p>
+                            {canManage && (
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  disabled={actionStatus === "loading"}
+                                  onClick={() =>
+                                    onAction("approve_approval", undefined, {
+                                      approvalId: approval.id,
+                                      note: "approved_from_monitoring",
+                                    })
+                                  }
+                                >
+                                  <PlayCircle className="mr-2 size-4" />
+                                  批准并发布
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={actionStatus === "loading"}
+                                  onClick={() =>
+                                    onAction("reject_approval", undefined, {
+                                      approvalId: approval.id,
+                                      note: "rejected_from_monitoring",
+                                    })
+                                  }
+                                >
+                                  <PauseCircle className="mr-2 size-4" />
+                                  拒绝
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -389,8 +789,8 @@ export function MonitoringPage({
               <div className="grid gap-3 2xl:grid-cols-[minmax(0,1fr)_360px]">
                 <Card className="bg-card/90 shadow-md backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-base">Workflow Timeline</CardTitle>
-                    <CardDescription>最近 12 条实例活动事件</CardDescription>
+                    <CardTitle className="text-base">Forum Timeline</CardTitle>
+                    <CardDescription>forum 域工作流事件，native transcript 在右侧作为主观察源</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -444,6 +844,12 @@ export function MonitoringPage({
                             <Badge variant={openclawBridge.status === "connected" ? "secondary" : "outline"}>
                               {openclawBridge.status}
                             </Badge>
+                            <Badge variant="outline">
+                              global native {orchestrator?.nativeRuntime?.status || "暂无"}
+                            </Badge>
+                            <Badge variant="outline">
+                              {orchestrator?.lifecycle.schedulerRole || "compatibility-layer"}
+                            </Badge>
                             <Badge variant="outline">homes {openclawBridge.summary.homes}</Badge>
                             <Badge variant="outline">agents {openclawBridge.summary.agents}</Badge>
                             <Badge variant="outline">sessions {openclawBridge.summary.sessions}</Badge>
@@ -464,6 +870,7 @@ export function MonitoringPage({
                                 <p>native agents: {selectedNativeHome.agentCount}</p>
                                 <p>sessions: {selectedNativeHome.sessionCount}</p>
                                 <p>latest activity: {formatObserverTimestamp(selectedNativeHome.latestUpdatedAt)}</p>
+                                <p>presence source: {getPresenceSourceLabel(selectedInstance.onlineSource)}</p>
                               </div>
                             </div>
                           ) : selectedInstance ? (
@@ -484,7 +891,7 @@ export function MonitoringPage({
                                       {agent.label}
                                     </Badge>
                                     <span className="text-xs text-muted-foreground">
-                                      {agent.online ? "native 在线" : "native 非活跃"}
+                                      {getNativePresenceLabel(selectedInstance.nativeStatus)}
                                     </span>
                                   </div>
                                   <p className="mt-3 text-sm font-medium">
@@ -497,6 +904,7 @@ export function MonitoringPage({
                                     <p>latest session: {agent.latestSessionId || "暂无"}</p>
                                     <p>updated: {formatObserverTimestamp(agent.updatedAt)}</p>
                                     <p>skills: {agent.skills.length > 0 ? agent.skills.join(", ") : "暂无"}</p>
+                                    <p>activity source: {getPresenceSourceLabel(selectedInstance.activitySource)}</p>
                                   </div>
 
                                   {agent.recentEvents.length > 0 && (
@@ -649,8 +1057,8 @@ export function MonitoringPage({
                     <CardContent className="space-y-2 text-sm text-muted-foreground">
                       <p>在线只表示最近收到了心跳，不等价于实例一定在工作。</p>
                       <p>冷却中、待审批和拦截态都属于“可见但被限制”的状态，不应误判为离线。</p>
-                      <p>如果 timeline 长时间不变，优先看最近心跳和下一轮调度时间。</p>
-                      <p>Native Runtime 区块来自 OpenClaw 原生 session/transcript/memory，和 forum 域状态是两条不同的数据源。</p>
+                      <p>现在优先看 native transcript / session 活动，再看 forum 调度心跳和下一轮调度时间。</p>
+                      <p>Native Runtime 区块是主观察源；forum Timeline 只补 quota、cooldown、blocked reason 等域信息。</p>
                     </CardContent>
                   </Card>
                 </div>

@@ -32,6 +32,9 @@ function parseArgs(argv) {
     resetPolicyState: process.env.OPENCLAW_FORUM_RESET_POLICY_STATE !== "false",
     maxReplyPolls: Number.parseInt(process.env.OPENCLAW_FORUM_REPLY_POLLS || "4", 10),
     pollDelayMs: Number.parseInt(process.env.OPENCLAW_FORUM_POLL_DELAY_MS || "4000", 10),
+    verifyYolo: process.env.OPENCLAW_FORUM_VERIFY_YOLO === "true",
+    yoloDurationMs: Number.parseInt(process.env.OPENCLAW_FORUM_YOLO_DURATION_MS || "60000", 10),
+    yoloExpirySlackMs: Number.parseInt(process.env.OPENCLAW_FORUM_YOLO_EXPIRY_SLACK_MS || "15000", 10),
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -93,6 +96,17 @@ function parseArgs(argv) {
         options.pollDelayMs = Number.parseInt(next, 10);
         index += 1;
         break;
+      case "--verify-yolo":
+        options.verifyYolo = true;
+        break;
+      case "--yolo-duration-ms":
+        options.yoloDurationMs = Number.parseInt(next, 10);
+        index += 1;
+        break;
+      case "--yolo-expiry-slack-ms":
+        options.yoloExpirySlackMs = Number.parseInt(next, 10);
+        index += 1;
+        break;
       case "-h":
       case "--help":
         printHelp();
@@ -123,7 +137,10 @@ Options:
   --policy-state-path <path>  forum bot policy state file
   --no-reset-policy-state     keep existing quota/cooldown state
   --max-reply-polls <n>       max run_once polls waiting for a bot reply, default 4
-  --poll-delay-ms <ms>        delay between reply polls, default 4000`);
+  --poll-delay-ms <ms>        delay between reply polls, default 4000
+  --verify-yolo              also verify YOLO enable -> burst -> expiry -> recovery
+  --yolo-duration-ms <ms>     YOLO verification duration, default 60000
+  --yolo-expiry-slack-ms <ms> extra wait after YOLO expiry, default 15000`);
 }
 
 function resolveOpenClawInvocation(options) {
@@ -222,6 +239,20 @@ async function requestJson(url, init = {}) {
       await wait(1000 * attempt);
     }
   }
+}
+
+async function requestObserverAction(origin, token, action, body = {}) {
+  return requestJson(`${origin}/api/observer/orchestrator/actions`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      action,
+      ...body,
+    }),
+  });
 }
 
 function wait(ms) {
@@ -346,6 +377,117 @@ function flattenReplyAuthors(threadPayload) {
   return authors;
 }
 
+function aggregateDashboardStats(dashboard) {
+  const instances = dashboard?.orchestrator?.instances ?? [];
+  return {
+    cycles: instances.reduce((total, instance) => total + (instance.stats?.cycles ?? 0), 0),
+    replies: instances.reduce((total, instance) => total + (instance.stats?.replies ?? 0), 0),
+    yoloReplies: instances.reduce((total, instance) => total + (instance.quota?.yoloReplies ?? 0), 0),
+    blocked: instances.reduce((total, instance) => total + (instance.stats?.blocked ?? 0), 0),
+  };
+}
+
+async function verifyYoloMode(options, adminSession) {
+  logStep(`start yolo verification for ${options.yoloDurationMs}ms`);
+  const beforeDashboard = await requestJson(`${options.origin}/api/observer/dashboard`);
+  const beforeStats = aggregateDashboardStats(beforeDashboard);
+
+  let startedDashboard = await requestObserverAction(options.origin, adminSession.token, "start_yolo", {
+    durationMs: options.yoloDurationMs,
+    reason: "runtime_gate_verify_yolo",
+  });
+  if (!startedDashboard?.orchestrator?.yoloMode?.enabled) {
+    const confirmDeadline = Date.now() + Math.max(options.pollDelayMs * 2, 10000);
+    while (Date.now() < confirmDeadline) {
+      await wait(Math.min(options.pollDelayMs, 3000));
+      startedDashboard = await requestJson(`${options.origin}/api/observer/dashboard`);
+      if (startedDashboard?.orchestrator?.yoloMode?.enabled) {
+        break;
+      }
+    }
+  }
+  if (!startedDashboard?.orchestrator?.yoloMode?.enabled) {
+    throw new Error("YOLO Mode did not become enabled");
+  }
+  const startedYoloMode = startedDashboard?.orchestrator?.yoloMode ?? {};
+  const effectiveDurationMs =
+    typeof startedYoloMode.durationMs === "number" && Number.isFinite(startedYoloMode.durationMs)
+      ? startedYoloMode.durationMs
+      : options.yoloDurationMs;
+
+  await wait(options.pollDelayMs);
+  await requestObserverAction(options.origin, adminSession.token, "run_once");
+  await wait(options.pollDelayMs);
+  const burstDashboard = await requestJson(`${options.origin}/api/observer/dashboard`);
+  const burstStats = aggregateDashboardStats(burstDashboard);
+  const yoloRepliesDelta = burstStats.yoloReplies - beforeStats.yoloReplies;
+  const cyclesDelta = burstStats.cycles - beforeStats.cycles;
+
+  const expiryDeadline = Date.now() + effectiveDurationMs + options.yoloExpirySlackMs;
+  let expiryDashboard = burstDashboard;
+  while (Date.now() < expiryDeadline) {
+    await wait(Math.min(options.pollDelayMs, 5000));
+    expiryDashboard = await requestJson(`${options.origin}/api/observer/dashboard`);
+    if (!expiryDashboard?.orchestrator?.yoloMode?.enabled) {
+      break;
+    }
+  }
+
+  if (expiryDashboard?.orchestrator?.yoloMode?.enabled) {
+    throw new Error("YOLO Mode did not expire within the expected verification window");
+  }
+
+  const recovery = expiryDashboard?.orchestrator?.yoloMode ?? {};
+  const recovered =
+    recovery.status === "expired" ||
+    recovery.recoveryStatus === "expired" ||
+    recovery.recoveryStatus === "stopped";
+
+  if (!recovered) {
+    throw new Error("YOLO Mode expired but recovery metadata was not updated");
+  }
+
+  return {
+    verified: true,
+    beforeStats,
+    started: {
+      enabled: Boolean(startedYoloMode.enabled),
+      durationMs: effectiveDurationMs,
+      expiresAt: startedYoloMode.expiresAt || "",
+      remainingMs: startedYoloMode.remainingMs ?? 0,
+    },
+    burst: {
+      cyclesDelta,
+      repliesDelta: burstStats.replies - beforeStats.replies,
+      yoloRepliesDelta,
+      blockedDelta: burstStats.blocked - beforeStats.blocked,
+    },
+    expiry: {
+      status: recovery.status || "",
+      recoveryStatus: recovery.recoveryStatus || "",
+      recoveryReason: recovery.recoveryReason || "",
+      lastRecoveryAt: recovery.lastRecoveryAt || "",
+      enabled: Boolean(recovery.enabled),
+    },
+  };
+}
+
+async function ensureWritableInstancesReady(options, adminSession) {
+  const dashboard = await requestJson(`${options.origin}/api/observer/dashboard`);
+  if (dashboard?.orchestrator?.paused) {
+    await requestObserverAction(options.origin, adminSession.token, "resume");
+  }
+
+  const instances = dashboard?.orchestrator?.instances ?? [];
+  for (const instance of instances) {
+    if (instance?.paused) {
+      await requestObserverAction(options.origin, adminSession.token, "resume_instance", {
+        instanceId: instance.id,
+      });
+    }
+  }
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const uniqueSuffix = Date.now().toString(36).slice(-8);
@@ -379,6 +521,8 @@ async function main() {
       password: options.adminPassword,
     }),
   });
+  logStep("ensure orchestrator and writable instances are resumed");
+  await ensureWritableInstancesReady(options, adminSession);
 
   const postPrompt = [
     `Use the OpenClaw forum workflow against ${options.origin}.`,
@@ -482,6 +626,10 @@ async function main() {
     postRun,
     readbackRun,
   };
+
+  if (options.verifyYolo) {
+    result.yolo = await verifyYoloMode(options, adminSession);
+  }
 
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
 }

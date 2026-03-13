@@ -1,0 +1,61 @@
+## 2026-03-13 04:57:40 +08:00
+
+- User prompt:
+  - `嗯，挺好的，不过还有一个问题`
+  - `就是，我们是run subagents, 那么能否保持subagents的上下文呢？`
+  - `此外我也想知道直接新开一个CodeX线程当作subagents和codex自带的subagents有什么区别`
+  - `哦哦，我觉得也不想思考太多了，`
+  - `把这两个都补上：`
+  - `resumeThread 机制，让 subagent 真正保留上下文。`
+  - `watch_run 机制，让你实时看到每个 subagent 在干什么。`
+- Context and intent:
+  - The existing `codex-subagents-simple` runner launched independent Codex threads but only used `thread.run(...)`, so no mid-run observability existed and thread IDs were not reused across runs.
+  - The requested outcome was to make subagent context persistent across repeated runs and provide a local real-time watcher so the operator can see whether workers are truly progressing.
+- Files touched:
+  - `.agents/skills/codex-subagents-simple/scripts/run_subagents.ts`
+  - `.agents/skills/codex-subagents-simple/scripts/watch_run.ts`
+  - `.agents/skills/codex-subagents-simple/package.json`
+  - `.agents/skills/codex-subagents-simple/SKILL.md`
+  - `.agent_cache/codex-subagents-simple/thread-registry.json`
+  - `.agent_cache/codex-subagents-simple/latest-run.json`
+  - `.agent_cache/codex-subagents-simple-smoke/run-fresh/*`
+  - `.agent_cache/codex-subagents-simple-smoke/run-resume/*`
+- Change summary:
+  - Reworked the runner to use `runStreamed()` instead of `run()`, so it can observe item-level progress while a subagent turn is still executing.
+  - Added a persistent thread registry at `.agent_cache/codex-subagents-simple/thread-registry.json` keyed by `spec path + subagent name`.
+  - Added default thread reuse via `resumeThread(...)` and a `--fresh` escape hatch to force new threads.
+  - Added per-subagent runtime artifacts:
+    - `agents/<name>.status.json`
+    - `agents/<name>.events.jsonl`
+    - `run.json`
+    - `latest-run.json`
+  - Added `watch_run.ts` and an npm script `npm --prefix .agents/skills/codex-subagents-simple run watch` to inspect the latest run or a specific `runDir`.
+  - Updated `SKILL.md` with context retention, `--fresh`, watcher usage, and new output files.
+- Impact scope:
+  - Only the local skill `.agents/skills/codex-subagents-simple` was changed.
+  - No forum business modules or product runtime were modified.
+- Risk notes:
+  - Event logging now writes more files under `.agent_cache`, which improves observability but increases run artifact volume.
+  - Resumed threads intentionally preserve prior context; operators should use `--fresh` when they want isolation.
+- Verification:
+  - `npm --prefix .agents/skills/codex-subagents-simple run typecheck`
+  - Fresh run with explicit `runDir`:
+    - `npm --prefix .agents/skills/codex-subagents-simple run subagents -- --spec /home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple-smoke/hello-world-spec.json --workspace-root /home/wudizhe001/Documents/GitHub/agents-forum --run-dir /home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple-smoke/run-fresh --model gpt-5.4 --reasoning-effort high --max-parallel 3 --fresh`
+  - Watcher during active fresh run:
+    - `npm --prefix .agents/skills/codex-subagents-simple run watch -- --run-dir /home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple-smoke/run-fresh --once`
+    - Confirmed live `command_execution` and `file_change` details while workers were still running.
+  - Registry persisted:
+    - `sed -n '1,240p' .agent_cache/codex-subagents-simple/thread-registry.json`
+  - Resume run with the same spec:
+    - `npm --prefix .agents/skills/codex-subagents-simple run subagents -- --spec /home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple-smoke/hello-world-spec.json --workspace-root /home/wudizhe001/Documents/GitHub/agents-forum --run-dir /home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple-smoke/run-resume --model gpt-5.4 --reasoning-effort high --max-parallel 3`
+  - Watcher during resumed run:
+    - `npm --prefix .agents/skills/codex-subagents-simple run watch -- --run-dir /home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple-smoke/run-resume --once`
+    - Confirmed `resume=resumed` and reused thread IDs for all three workers.
+  - Repo workflows after changes:
+    - `node scripts/repo-metadata/scripts/scan.mjs --update`
+    - `node scripts/repo-metadata/scripts/generate-structure-md.mjs`
+    - `bash scripts/check_errors.sh`
+    - `npm test`
+- Git anchor:
+  - branch: `main`
+  - HEAD: `1155c5f239ba263a545d3f1094a6927f4dd7c10b`

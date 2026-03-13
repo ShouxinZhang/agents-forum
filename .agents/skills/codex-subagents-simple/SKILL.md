@@ -57,6 +57,46 @@ npm --prefix .agents/skills/codex-subagents-simple run subagents -- \
   --max-parallel 3
 ```
 
+### 4) 保留 subagent 上下文
+
+默认会把 `subagent name + spec path` 对应的 `threadId` 写到：
+
+```text
+.agent_cache/codex-subagents-simple/thread-registry.json
+```
+
+下一次运行同一个 spec 时，会自动 `resumeThread(...)`，让每个 subagent 继续自己的线程上下文。
+
+如果你想强制忽略旧线程，使用：
+
+```bash
+npm --prefix .agents/skills/codex-subagents-simple run subagents -- \
+  --spec /abs/path/to/subagents-spec.json \
+  --workspace-root /abs/path/to/workspace \
+  --fresh
+```
+
+### 5) 实时观察 subagent 工作上下文
+
+运行时会在每个 `runDir` 下写：
+
+- `agents/<name>.status.json`
+- `agents/<name>.events.jsonl`
+- `run.json`
+
+可以实时观察最近一次 run：
+
+```bash
+npm --prefix .agents/skills/codex-subagents-simple run watch
+```
+
+也可以指定某个 `runDir`：
+
+```bash
+npm --prefix .agents/skills/codex-subagents-simple run watch -- \
+  --run-dir /abs/path/to/run-dir
+```
+
 ## Spec 结构
 
 ```json
@@ -95,6 +135,9 @@ npm --prefix .agents/skills/codex-subagents-simple run subagents -- \
 
 - 默认输出到 `.agent_cache/codex-subagents-simple/<timestamp>-<slug>/`
 - `spec.normalized.json`: 标准化后的执行 spec
+- `run.json`: 本次 run 的元信息与整体状态
+- `agents/<name>.status.json`: subagent 当前状态快照
+- `agents/<name>.events.jsonl`: subagent 流式事件日志
 - `agents/<name>.json`: 每个 subagent 的结构化结果
 - `summary.md`: 汇总结果
 

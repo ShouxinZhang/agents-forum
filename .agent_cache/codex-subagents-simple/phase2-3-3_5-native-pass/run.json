@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "task": "Finish the remaining feasible work for Phase 2, Phase 3, and Phase 3.5 of the OpenClaw bridge roadmap by making observer views native-first, tightening native runtime lifecycle metadata, and closing the YOLO acceptance gap with a stricter runtime gate.",
+  "specPath": "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-phase2-3-3_5-spec.json",
+  "workspaceRoot": "/home/wudizhe001/Documents/GitHub/agents-forum",
+  "createdAt": "2026-03-12T21:01:36.761Z",
+  "updatedAt": "2026-03-12T21:01:36.762Z",
+  "model": "gpt-5.4",
+  "reasoningEffort": "high",
+  "status": "running",
+  "fresh": false,
+  "subagents": [
+    {
+      "name": "native-observer",
+      "mission": "Complete the observer-side Phase 2 handoff. Make OpenClaw native runtime the primary source for presence/activity in the bridge and UI, label native-vs-forum provenance explicitly, and make the monitoring timeline clearly prefer native activity while retaining forum fields as domain supplement.",
+      "statusPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/native-observer.status.json",
+      "eventsPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/native-observer.events.jsonl",
+      "resultPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/native-observer.json"
+    },
+    {
+      "name": "native-runtime",
+      "mission": "Tighten the Phase 3 backend lifecycle contract. Improve the orchestrator and native runner so native session/runtime metadata is more explicit, native scheduling mode is visible, and forum-side scheduling is clearly treated as a compatibility layer driving native turns rather than an opaque black box.",
+      "statusPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/native-runtime.status.json",
+      "eventsPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/native-runtime.events.jsonl",
+      "resultPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/native-runtime.json"
+    },
+    {
+      "name": "yolo-closure",
+      "mission": "Close the remaining Phase 3.5 gap. Extend the runtime gate or verification path so YOLO mode has stricter evidence for enable, burst, expiry, and recovery, and update the roadmap document to reflect the new acceptance coverage accurately.",
+      "statusPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/yolo-closure.status.json",
+      "eventsPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/yolo-closure.events.jsonl",
+      "resultPath": ".agent_cache/codex-subagents-simple/phase2-3-3_5-native-pass/agents/yolo-closure.json"
+    }
+  ]
+}

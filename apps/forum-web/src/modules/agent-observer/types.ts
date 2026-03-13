@@ -67,6 +67,67 @@ export type OpenClawInstanceQuota = {
   limit: number
   remainingMs: number
   pendingApprovals: number
+  yoloReplies?: number
+}
+
+export type OpenClawPresenceSource = "native" | "forum" | "mixed" | "none"
+
+export type OpenClawNativeRuntimeStatus =
+  | "booting"
+  | "running"
+  | "idle"
+  | "paused"
+  | "error"
+  | "stale"
+
+export type OpenClawInstanceNativeRuntime = {
+  status: OpenClawNativeRuntimeStatus
+  sessionId: string
+  lastHeartbeatAt: string
+  lastStartedAt: string
+  lastCompletedAt: string
+  lastSuccessAt: string
+  lastErrorAt: string
+  lastExitCode: number | null
+  runCount: number
+  consecutiveFailures: number
+  currentRunReason: string
+  lastError: string
+  lastRecoveredAt: string
+  lastRecoveryReason: string
+  stale?: boolean
+}
+
+export type OpenClawGlobalNativeRuntime = {
+  status: OpenClawNativeRuntimeStatus | "idle"
+  lastHeartbeatAt: string
+  lastStartedAt: string
+  lastCompletedAt: string
+  activeRuns: number
+  onlineInstances: number
+  staleInstances: number
+  errorInstances: number
+  consecutiveFailures: number
+  lastError: string
+  lastRecoveredAt: string
+  lastRecoveryReason: string
+  staleAfterMs: number
+}
+
+export type OpenClawYoloMode = {
+  enabled: boolean
+  status: "disabled" | "enabled" | "expired"
+  startedAt: string
+  expiresAt: string
+  durationMs: number
+  startedBy: string
+  reason: string
+  remainingMs: number
+  lastEventAt: string
+  lastEventBy: string
+  lastRecoveryAt: string
+  recoveryStatus: string
+  recoveryReason: string
 }
 
 export type OpenClawInstanceStats = {
@@ -75,6 +136,83 @@ export type OpenClawInstanceStats = {
   reads: number
   blocked: number
   errors: number
+}
+
+export type OpenClawReplyContextHighlight = {
+  author: string
+  text: string
+}
+
+export type OpenClawReplyContextMemoryHit = {
+  id: string
+  label: string
+  source: string
+  summary: string
+  updatedAt: string
+}
+
+export type OpenClawReplyContextTarget = {
+  kind: string
+  author: string
+  floorId: string
+  replyId: string
+  summary: string
+}
+
+export type OpenClawReplyContextTrace = {
+  updatedAt: string
+  createdAt?: string
+  id?: string
+  source: "openclaw-native" | "local-fallback" | "native" | "forum" | "mixed" | "none" | "unknown"
+  persona: string
+  contextSources: string[]
+  threadId: string
+  threadTitle: string
+  threadSummary?: string
+  rootExcerpt: string
+  rootPostSummary?: string
+  targetSummary: string
+  replySummary?: string
+  whyThisReply?: string
+  generationSource?: string
+  finalSource?: string
+  target?: OpenClawReplyContextTarget | null
+  replyHighlights: OpenClawReplyContextHighlight[]
+  memoryHighlights: string[]
+  memoryHits?: OpenClawReplyContextMemoryHit[]
+  memoryApplied?: string
+  seedReply: string
+  nativeDraft?: string
+  finalReply: string
+  basis: string[]
+  promptSummary: string
+  posted: boolean
+}
+
+export type OpenClawApprovalRequest = {
+  id: string
+  status: "pending" | "approved" | "rejected" | "executed"
+  botUsername: string
+  instanceId: string
+  threadId: string
+  threadTitle: string
+  sectionId: string
+  title: string
+  content: string
+  target: Record<string, unknown>
+  approvalMode: string
+  timestamp: string
+  requestedBy: string
+  source: string
+  instruction: string
+  note: string
+  auditId: string
+  whyThisReply: string
+  memoryApplied: string
+  replyContextTrace: OpenClawReplyContextTrace | null
+  resolvedAt: string
+  resolvedBy: string
+  resolutionNote: string
 }
 
 export type OpenClawInstance = {
@@ -90,7 +228,12 @@ export type OpenClawInstance = {
   status: OpenClawInstanceStatus
   paused: boolean
   workspaceReady: boolean
+  schedulerOnline: boolean
   online: boolean
+  observedActive: boolean
+  onlineSource: OpenClawPresenceSource
+  activitySource: OpenClawPresenceSource
+  primaryTimelineSource: "native" | "forum" | "none"
   nextRunAt: string
   lastHeartbeatAt: string
   lastTransitionAt: string
@@ -99,8 +242,16 @@ export type OpenClawInstance = {
   lastDecision: string
   lastSummary: string
   lastError: string
+  nativeRuntime: OpenClawInstanceNativeRuntime
+  nativeStatus: OpenClawNativeRuntimeStatus
+  nativeHeartbeatAt: string
+  nativeSessionId: string
+  nativeLastError: string
   workflow: OpenClawWorkflowSnapshot
   recentEvents: OpenClawWorkflowEvent[]
+  replyContext?: OpenClawReplyContextTrace | null
+  replyContextTrace?: OpenClawReplyContextTrace | null
+  latestReplyTrace?: OpenClawReplyContextTrace | null
   stats: OpenClawInstanceStats
   quota: OpenClawInstanceQuota
 }
@@ -108,10 +259,20 @@ export type OpenClawInstance = {
 export type OpenClawSummary = {
   total: number
   online: number
+  schedulerOnline: number
   writable: number
   active: number
+  observedActive: number
   paused: number
   blocked: number
+}
+
+export type OpenClawLifecycle = {
+  sourceOfTruth: "openclaw-native+forum-domain"
+  schedulerRole: "compatibility-layer"
+  turnDriver: "forum_scheduler_requests_native_plan_and_draft"
+  workingDirectoryMode: "instance-openclaw-root"
+  nativePreferred: boolean
 }
 
 export type OpenClawOrchestrator = {
@@ -124,10 +285,14 @@ export type OpenClawOrchestrator = {
   lastRunReason: string
   pausedReason: string
   lastError: string
+  nativeRuntime: OpenClawGlobalNativeRuntime
+  yoloMode: OpenClawYoloMode
+  lifecycle: OpenClawLifecycle
   statePath: string
   origin: string
   approvalMode: string
   instances: OpenClawInstance[]
+  approvals: OpenClawApprovalRequest[]
   summary: OpenClawSummary
 }
 
@@ -191,12 +356,28 @@ export type OpenClawBridgeSummary = {
   memoryDocs: number
 }
 
+export type OpenClawBridgeInstanceView = {
+  instanceId: string
+  homeId: string
+  agentId: string
+  observedOnline: boolean
+  observedActive: boolean
+  onlineSource: OpenClawPresenceSource
+  activitySource: OpenClawPresenceSource
+  primaryTimelineSource: "native" | "forum" | "none"
+  latestSessionId: string
+  nativeUpdatedAt: string
+  currentAction: string
+  currentSummary: string
+}
+
 export type OpenClawBridge = {
   status: "connected" | "partial" | "disconnected"
   source: "openclaw-native"
   summary: OpenClawBridgeSummary
   homes: OpenClawBridgeHome[]
   agents: OpenClawBridgeAgent[]
+  instanceViews: OpenClawBridgeInstanceView[]
   notes: string[]
 }
 

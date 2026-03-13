@@ -563,7 +563,17 @@ function App() {
     setObserverActionError("")
   }
 
-  const handleObserverAction = async (action: string, instanceId?: string) => {
+  const handleObserverAction = async (
+    action: string,
+    instanceId?: string,
+    options?: {
+      durationMs?: number
+      reason?: string
+      approvalId?: string
+      note?: string
+      threadId?: string
+    }
+  ) => {
     if (!sessionToken) {
       return
     }
@@ -572,7 +582,12 @@ function App() {
     setObserverActionError("")
 
     try {
-      const dashboard = await runObserverOrchestratorAction(sessionToken, action, instanceId)
+      const dashboard = await runObserverOrchestratorAction(
+        sessionToken,
+        action,
+        instanceId,
+        options
+      )
       startTransition(() => {
         setObserverDashboard(dashboard)
         setObserverActionStatus("idle")

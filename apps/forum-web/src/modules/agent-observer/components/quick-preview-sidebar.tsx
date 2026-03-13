@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { formatObserverTimestamp, getInstanceStatusLabel, getPresenceLabel, getStatusTone, isWorkingStatus } from "@/modules/agent-observer/format"
-import type { OpenClawBridge, OpenClawBridgeAgent, OpenClawInstance, OpenClawOrchestrator } from "@/modules/agent-observer/types"
+import { formatObserverDuration, formatObserverTimestamp, getInstanceStatusLabel, getNativePresenceLabel, getPresenceLabel, getPresenceSourceLabel, getStatusTone, isWorkingStatus } from "@/modules/agent-observer/format"
+import type { OpenClawBridge, OpenClawBridgeAgent, OpenClawBridgeInstanceView, OpenClawInstance, OpenClawOrchestrator } from "@/modules/agent-observer/types"
 
 type QuickPreviewSidebarProps = {
   orchestrator?: OpenClawOrchestrator
@@ -36,16 +36,19 @@ function SummaryPill({
 function InstancePreviewRow({
   instance,
   nativeAgent,
+  bridgeView,
   active,
   onClick,
 }: {
   instance: OpenClawInstance
   nativeAgent: OpenClawBridgeAgent | null
+  bridgeView: OpenClawBridgeInstanceView | null
   active: boolean
   onClick: () => void
 }) {
   const previewLine =
     nativeAgent?.currentSummary ||
+    instance.nativeRuntime?.currentRunReason ||
     instance.workflow.currentAction ||
     instance.lastSummary ||
     "等待下一轮调度"
@@ -71,7 +74,7 @@ function InstancePreviewRow({
             <p className="truncate text-sm font-semibold">{instance.label}</p>
           </div>
           <p className="mt-1 truncate text-xs text-muted-foreground">
-            {instance.botUsername} · {getPresenceLabel(instance.online)}
+            {instance.botUsername} · {getPresenceLabel(instance.online)} · {getPresenceSourceLabel(instance.onlineSource)}
           </p>
         </div>
         <Badge variant={getStatusTone(instance.status)}>
@@ -93,16 +96,18 @@ function InstancePreviewRow({
         <span>·</span>
         <span>
           {nativeAgent
-            ? `native ${nativeAgent.online ? "在线" : "已连接"}`
+            ? getNativePresenceLabel(instance.nativeStatus)
             : "native 未连接"}
         </span>
       </div>
 
-      {nativeAgent && (
+      {(nativeAgent || bridgeView) && (
         <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-          <span>session {nativeAgent.latestSessionId || "暂无"}</span>
+          <span>session {bridgeView?.latestSessionId || nativeAgent?.latestSessionId || "暂无"}</span>
           <span>·</span>
-          <span>native 活动 {formatObserverTimestamp(nativeAgent.updatedAt)}</span>
+          <span>native 活动 {formatObserverTimestamp(bridgeView?.nativeUpdatedAt || nativeAgent?.updatedAt || "")}</span>
+          <span>·</span>
+          <span>{getPresenceSourceLabel(instance.activitySource)}</span>
         </div>
       )}
     </button>
@@ -121,18 +126,23 @@ export function QuickPreviewSidebar({
 }: QuickPreviewSidebarProps) {
   const instances = orchestrator?.instances ?? []
   const onlineCount = instances.filter((instance) => instance.online).length
-  const workingCount = instances.filter((instance) => isWorkingStatus(instance.status)).length
+  const workingCount = instances.filter((instance) => instance.observedActive || isWorkingStatus(instance.status)).length
   const offlineCount = Math.max(0, instances.length - onlineCount)
+  const nativeRunningCount = instances.filter((instance) => instance.nativeStatus === "running").length
   const nativeLinkedCount =
     openclawBridge?.homes.filter((home) => home.linkedInstanceId && home.connected).length ?? 0
   const nativeOnlineCount =
     openclawBridge?.agents.filter((agent) => agent.linkedInstanceId && agent.online).length ?? 0
   const nativeByInstanceId = new Map<string, OpenClawBridgeAgent>()
+  const bridgeViewByInstanceId = new Map<string, OpenClawBridgeInstanceView>()
 
   openclawBridge?.agents.forEach((agent) => {
     if (agent.linkedInstanceId && !nativeByInstanceId.has(agent.linkedInstanceId)) {
       nativeByInstanceId.set(agent.linkedInstanceId, agent)
     }
+  })
+  openclawBridge?.instanceViews.forEach((view) => {
+    bridgeViewByInstanceId.set(view.instanceId, view)
   })
 
   return (
@@ -181,10 +191,18 @@ export function QuickPreviewSidebar({
             <p className="mt-2 text-muted-foreground">
               上次调度 {formatObserverTimestamp(orchestrator.lastTickAt)}，原因 {orchestrator.lastRunReason || "暂无"}
             </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Native-first 在线 {onlineCount}/{instances.length || 0}，其中调度在线 {orchestrator.summary.schedulerOnline}，native 运行中 {nativeRunningCount} 个。
+            </p>
             {openclawBridge && (
               <p className="mt-2 text-xs text-muted-foreground">
                 Native homes 已连接 {nativeLinkedCount} 个，最近活跃 agent {nativeOnlineCount} 个。
               </p>
+            )}
+            {orchestrator.yoloMode.enabled && (
+              <div className="mt-3 rounded-xl border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-xs text-orange-900">
+                YOLO Mode 已开启，剩余 {formatObserverDuration(orchestrator.yoloMode.remainingMs)}。
+              </div>
             )}
           </div>
         ) : status === "loading" ? (
@@ -219,6 +237,7 @@ export function QuickPreviewSidebar({
                   key={instance.id}
                   instance={instance}
                   nativeAgent={nativeByInstanceId.get(instance.id) ?? null}
+                  bridgeView={bridgeViewByInstanceId.get(instance.id) ?? null}
                   active={instance.id === activeInstanceId}
                   onClick={() => onSelectInstance(instance.id)}
                 />
@@ -230,7 +249,7 @@ export function QuickPreviewSidebar({
         <div className="rounded-2xl border border-border/70 bg-muted/25 p-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <WifiOff className="size-3.5" />
-            “在线/离线” 仍代表论坛调度心跳；native 状态单独展示，不等于实例已删除。
+            “在线/离线” 现在优先按 OpenClaw native 活动判断；论坛调度心跳只作为补充来源。
           </div>
         </div>
       </CardContent>

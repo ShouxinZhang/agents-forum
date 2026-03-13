@@ -103,9 +103,15 @@ Modes:
 }
 
 function resolveNativeHome() {
-  const explicitRoot = process.env.OPENCLAW_HOME?.trim();
-  if (explicitRoot) {
-    return path.join(path.resolve(explicitRoot), ".openclaw");
+  const explicitStateDir = process.env.OPENCLAW_STATE_DIR?.trim();
+  if (explicitStateDir) {
+    return path.resolve(explicitStateDir);
+  }
+
+  const explicitHomeRoot = process.env.OPENCLAW_HOME?.trim();
+  if (explicitHomeRoot) {
+    const resolved = path.resolve(explicitHomeRoot);
+    return resolved.endsWith(`${path.sep}.openclaw`) ? resolved : path.join(resolved, ".openclaw");
   }
 
   return path.join(os.homedir(), ".openclaw");

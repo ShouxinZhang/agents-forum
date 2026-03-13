@@ -7,8 +7,104 @@
     ],
     "generateMdDepth": 2
   },
-  "updatedAt": "2026-03-12T18:08:23.251Z",
+  "updatedAt": "2026-03-13T15:07:40.724Z",
   "nodes": {
+    ".agents": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/.gitignore": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/SKILL.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/agents": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/agents/openai.yaml": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/package-lock.json": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/package.json": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/scripts": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/scripts/run_subagents.ts": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".agents/skills/codex-subagents-simple/tsconfig.json": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
     ".gitattributes": {
       "type": "file",
       "description": "Git 属性配置。",
@@ -16,6 +112,30 @@
       "tags": [],
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    ".github": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".github/workflows": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    ".github/workflows/deploy-fortum.yml": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
     },
     ".gitignore": {
       "type": "file",
@@ -137,6 +257,14 @@
       "updatedBy": "llm",
       "updatedAt": "2026-03-11T18:39:29Z"
     },
+    "apps/forum-api/src/modules/auth/store.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
     "apps/forum-api/src/modules/bot-auth": {
       "type": "directory",
       "description": "论坛 Bot 账号与角色基线模块目录。",
@@ -249,6 +377,22 @@
       "updatedBy": "llm",
       "updatedAt": "2026-03-11T19:07:26.786Z"
     },
+    "apps/forum-api/src/modules/openclaw-bridge": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "apps/forum-api/src/modules/openclaw-bridge/service.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
     "apps/forum-api/src/modules/openclaw-orchestrator": {
       "type": "directory",
       "description": "",
@@ -256,6 +400,14 @@
       "tags": [],
       "updatedBy": "scan",
       "updatedAt": "2026-03-12T10:33:55.934Z"
+    },
+    "apps/forum-api/src/modules/openclaw-orchestrator/native-runner.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
     },
     "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs": {
       "type": "file",
@@ -513,6 +665,14 @@
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
     },
+    "apps/forum-web/src/lib/base-path.ts": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
     "apps/forum-web/src/lib/utils.ts": {
       "type": "file",
       "description": "TypeScript 文件：utils.ts",
@@ -569,6 +729,22 @@
       "updatedBy": "llm",
       "updatedAt": "2026-03-12T01:09:48.000Z"
     },
+    "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "apps/forum-web/src/modules/agent-observer/components/quick-preview-sidebar.tsx": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
     "apps/forum-web/src/modules/agent-observer/data.ts": {
       "type": "file",
       "description": "Agent 透明观测静态演示数据。",
@@ -576,6 +752,14 @@
       "tags": [],
       "updatedBy": "llm",
       "updatedAt": "2026-03-12T01:09:48.000Z"
+    },
+    "apps/forum-web/src/modules/agent-observer/format.ts": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
     },
     "apps/forum-web/src/modules/agent-observer/types.ts": {
       "type": "file",
@@ -737,6 +921,62 @@
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
     },
+    "docs/deploy": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "docs/deploy/README.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "docs/deploy/assets": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "docs/deploy/assets/agent-fortum-location.conf": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "docs/deploy/assets/agents-forum-ip.conf": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "docs/deploy/assets/forum-api.service": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "docs/deploy/tencent-lighthouse.md": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
     "docs/dev_logs": {
       "type": "directory",
       "description": "开发过程日志目录。",
@@ -748,158 +988,6 @@
     "docs/dev_plan": {
       "type": "directory",
       "description": "产品与研发计划文档目录。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "human",
-      "updatedAt": "2026-02-10T02:27:29.628Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan": {
-      "type": "directory",
-      "description": "Agents Forum 分模块依赖实现图子计划目录。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan.md": {
-      "type": "file",
-      "description": "Agents Forum 分模块依赖实现图总入口。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/00-overview.md": {
-      "type": "file",
-      "description": "分模块依赖计划总览。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/01-module-map.md": {
-      "type": "file",
-      "description": "论坛模块边界与依赖图。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/02-phase-a-foundation.md": {
-      "type": "file",
-      "description": "阶段 A：契约与基础模块计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/03-phase-b-auth.md": {
-      "type": "file",
-      "description": "阶段 B：认证与会话计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/04-phase-c-forum-read.md": {
-      "type": "file",
-      "description": "阶段 C：论坛读取能力计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/05-phase-d-forum-write.md": {
-      "type": "file",
-      "description": "阶段 D：论坛写能力计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/06-phase-e-agent-observer.md": {
-      "type": "file",
-      "description": "阶段 E：Agent 透明观测计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/07-phase-f-mcp.md": {
-      "type": "file",
-      "description": "阶段 F：MCP 接入计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/08-phase-g-quality.md": {
-      "type": "file",
-      "description": "阶段 G：治理与质量计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/09-phase-h-openclaw-skill.md": {
-      "type": "file",
-      "description": "阶段 H：OpenClaw Forum Skill 计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/10-phase-i-multi-claw-bots.md": {
-      "type": "file",
-      "description": "阶段 I：多 Claw Bot 接入计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/11-phase-j-skill-dev-and-test.md": {
-      "type": "file",
-      "description": "阶段 J：Skill 开发与测试体系计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_module_dependency_diagram_plan/12-reddit-feed-and-detail.md": {
-      "type": "file",
-      "description": "Reddit 式 Feed 与独立详情架构计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T01:09:48.000Z"
-    },
-    "docs/dev_plan/agents_forum_mvp_plan.md": {
-      "type": "file",
-      "description": "Agents Forum MVP 分阶段计划。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "human",
-      "updatedAt": "2026-02-10T02:27:29.628Z"
-    },
-    "docs/dev_plan/image": {
-      "type": "directory",
-      "description": "目录：image",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "human",
-      "updatedAt": "2026-02-10T02:27:29.628Z"
-    },
-    "docs/dev_plan/image/agents_forum_mvp_plan": {
-      "type": "directory",
-      "description": "目录：agents_forum_mvp_plan",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "human",
-      "updatedAt": "2026-02-10T02:27:29.628Z"
-    },
-    "docs/dev_plan/image/agents_forum_mvp_plan/1770651084283.png": {
-      "type": "file",
-      "description": "PNG 图片资源：1770651084283.png",
       "detail": "",
       "tags": [],
       "updatedBy": "human",
@@ -1089,21 +1177,13 @@
       "updatedBy": "scan",
       "updatedAt": "2026-03-12T10:18:13.963Z"
     },
-    "docs/dev_plan/openclaw-forum-bot-personas.md": {
+    "docs/dev_plan/old/openclaw-multi-bot-forum-plan.md": {
       "type": "file",
-      "description": "OpenClaw Forum Bot persona 规划文档。",
+      "description": "",
       "detail": "",
       "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T08:38:40+08:00"
-    },
-    "docs/dev_plan/openclaw-forum-bot-safety-policy.md": {
-      "type": "file",
-      "description": "OpenClaw Forum Bot 安全策略与治理边界文档。",
-      "detail": "",
-      "tags": [],
-      "updatedBy": "llm",
-      "updatedAt": "2026-03-12T08:38:40+08:00"
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
     },
     "docs/dev_plan/openclaw-multi-bot-forum-plan.md": {
       "type": "file",
@@ -1152,6 +1232,62 @@
       "tags": [],
       "updatedBy": "human",
       "updatedAt": "2026-02-10T02:27:29.628Z"
+    },
+    "scripts/deploy": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "scripts/deploy/tencent-lighthouse.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "scripts/openclaw": {
+      "type": "directory",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "scripts/openclaw/bootstrap-openclaw-forum.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "scripts/openclaw/check-openclaw-forum.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "scripts/openclaw/forum-native-turn.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
+    "scripts/openclaw/runtime-gate.mjs": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
     },
     "scripts/repo-map": {
       "type": "directory",
@@ -2169,6 +2305,14 @@
       "updatedBy": "llm",
       "updatedAt": "2026-03-11T19:07:26.786Z"
     },
+    "skills/openclaw-forum-bot/scripts/install-check.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
+    },
     "skills/openclaw-forum-bot/scripts/login.sh": {
       "type": "file",
       "description": "校验论坛登录凭据是否可用的脚本。",
@@ -2176,6 +2320,14 @@
       "tags": [],
       "updatedBy": "llm",
       "updatedAt": "2026-03-11T19:07:26.786Z"
+    },
+    "skills/openclaw-forum-bot/scripts/smoke.sh": {
+      "type": "file",
+      "description": "",
+      "detail": "",
+      "tags": [],
+      "updatedBy": "scan",
+      "updatedAt": "2026-03-12T20:21:51.820Z"
     },
     "skills/openclaw-forum-bot/scripts/start-mcp.sh": {
       "type": "file",

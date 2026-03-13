@@ -62,6 +62,67 @@ export function resolveNativeLayout(instance) {
   };
 }
 
+function normalizePathForCompare(value) {
+  return typeof value === "string" && value.trim() ? path.resolve(value) : "";
+}
+
+function resolveConfiguredWorkspaceDir(config, layout) {
+  const configured = config?.agents?.defaults?.workspace;
+  if (typeof configured !== "string" || !configured.trim()) {
+    return layout.workspaceDir;
+  }
+
+  if (configured.startsWith("~/")) {
+    return path.join(os.homedir(), configured.slice(2));
+  }
+
+  return path.isAbsolute(configured)
+    ? path.resolve(configured)
+    : path.resolve(layout.homePath, configured);
+}
+
+export function describeNativeRuntimeBinding(layout, config = safeReadJson(layout.configPath) || {}) {
+  const configuredWorkspaceDir = resolveConfiguredWorkspaceDir(config, layout);
+  const bindingVerified =
+    normalizePathForCompare(layout.workspaceDir) === normalizePathForCompare(configuredWorkspaceDir) &&
+    normalizePathForCompare(layout.homePath) ===
+      normalizePathForCompare(path.dirname(layout.configPath));
+
+  return {
+    mode: "native_turn_bridge",
+    driver: "forum_scheduler_requests_native_turns",
+    schedulerRole: "compatibility-layer",
+    rootPath: layout.rootPath,
+    homePath: layout.homePath,
+    workspaceDir: layout.workspaceDir,
+    configPath: layout.configPath,
+    configuredWorkspaceDir,
+    openclawHomeEnv: layout.rootPath,
+    openclawStateDirEnv: layout.homePath,
+    invocationCwd: repoRoot,
+    bindingVerified,
+    verifiedAt: new Date().toISOString(),
+  };
+}
+
+export function verifyNativeRuntimeBinding(instance) {
+  const layout = resolveNativeLayout(instance);
+  const config = safeReadJson(layout.configPath) || {};
+  const binding = describeNativeRuntimeBinding(layout, config);
+
+  if (!binding.bindingVerified) {
+    throw new Error(
+      `native runtime binding mismatch for ${instance?.id || "instance"}: workspace ${binding.configuredWorkspaceDir || "missing"}`
+    );
+  }
+
+  return {
+    layout,
+    config,
+    binding,
+  };
+}
+
 function copyRecursiveIfMissing(sourcePath, targetPath) {
   if (!fs.existsSync(sourcePath) || fs.existsSync(targetPath)) {
     return;
@@ -154,7 +215,10 @@ export function ensureNativeRuntimeReady(instance) {
     cwd: repoRoot,
     env: {
       ...process.env,
-      OPENCLAW_HOME: layout.homePath,
+      OPENCLAW_HOME: layout.rootPath,
+      OPENCLAW_STATE_DIR: layout.homePath,
+      OPENCLAW_CONFIG_PATH: layout.configPath,
+      OPENCLAW_WORKSPACE: layout.workspaceDir,
     },
     encoding: "utf8",
     maxBuffer: 10 * 1024 * 1024,
@@ -165,7 +229,7 @@ export function ensureNativeRuntimeReady(instance) {
   }
 
   ensureNativeConfig(layout);
-  return layout;
+  return verifyNativeRuntimeBinding(instance).layout;
 }
 
 export async function runNativeAgentTurn({
@@ -174,7 +238,8 @@ export async function runNativeAgentTurn({
   sessionId,
   timeoutSeconds = 120,
 }) {
-  const layout = ensureNativeRuntimeReady(instance);
+  ensureNativeRuntimeReady(instance);
+  const { layout, binding } = verifyNativeRuntimeBinding(instance);
   const args = [
     openclawCliEntry,
     "agent",
@@ -192,10 +257,14 @@ export async function runNativeAgentTurn({
 
   const result = await new Promise((resolve, reject) => {
     const child = spawn("node", args, {
-      cwd: repoRoot,
+      cwd: layout.rootPath,
       env: {
         ...process.env,
         OPENCLAW_HOME: layout.rootPath,
+        OPENCLAW_STATE_DIR: layout.homePath,
+        OPENCLAW_CONFIG_PATH: layout.configPath,
+        FORUM_OPENCLAW_RUNTIME_ROOT: layout.rootPath,
+        FORUM_OPENCLAW_WORKSPACE_DIR: layout.workspaceDir,
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -237,6 +306,13 @@ export async function runNativeAgentTurn({
 
   return {
     layout,
+    runtimeBinding: binding,
+    invocation: {
+      cwd: layout.rootPath,
+      homePath: layout.homePath,
+      workspaceDir: layout.workspaceDir,
+      cliEntry: openclawCliEntry,
+    },
     result,
   };
 }

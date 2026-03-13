@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "task": "Smoke test codex-subagents-simple with three tiny workers that each write one markdown file under .agent_cache.",
+  "specPath": "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple-smoke/hello-world-spec.json",
+  "workspaceRoot": "/home/wudizhe001/Documents/GitHub/agents-forum",
+  "createdAt": "2026-03-12T20:54:54.005Z",
+  "updatedAt": "2026-03-12T20:55:48.022Z",
+  "model": "gpt-5.4",
+  "reasoningEffort": "high",
+  "status": "completed",
+  "fresh": true,
+  "subagents": [
+    {
+      "name": "hello-alpha",
+      "mission": "Create the alpha smoke markdown file with a single Hello, world message and a unique id.",
+      "statusPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-alpha.status.json",
+      "eventsPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-alpha.events.jsonl",
+      "resultPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-alpha.json"
+    },
+    {
+      "name": "hello-beta",
+      "mission": "Create the beta smoke markdown file with a single Hello, world message and a unique id.",
+      "statusPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-beta.status.json",
+      "eventsPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-beta.events.jsonl",
+      "resultPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-beta.json"
+    },
+    {
+      "name": "hello-gamma",
+      "mission": "Create the gamma smoke markdown file with a single Hello, world message and a unique id.",
+      "statusPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-gamma.status.json",
+      "eventsPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-gamma.events.jsonl",
+      "resultPath": ".agent_cache/codex-subagents-simple-smoke/run-fresh/agents/hello-gamma.json"
+    }
+  ]
+}

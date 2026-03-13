@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "name": "native-observer",
+  "mission": "Complete the observer-side Phase 2 handoff. Make OpenClaw native runtime the primary source for presence/activity in the bridge and UI, label native-vs-forum provenance explicitly, and make the monitoring timeline clearly prefer native activity while retaining forum fields as domain supplement.",
+  "ownedPaths": [
+    "apps/forum-api/src/modules/openclaw-bridge/service.mjs",
+    "apps/forum-api/src/modules/agent-observer/routes.mjs",
+    "apps/forum-web/src/modules/agent-observer/types.ts",
+    "apps/forum-web/src/modules/agent-observer/format.ts",
+    "apps/forum-web/src/modules/agent-observer/components/quick-preview-sidebar.tsx",
+    "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx"
+  ],
+  "readFiles": [
+    "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+    "apps/forum-web/src/modules/agent-observer/api.ts"
+  ],
+  "extraInstructions": [
+    "Keep the API and UI changes coherent end-to-end.",
+    "Do not weaken existing moderator actions or auth behaviour.",
+    "Bias toward adding explicit provenance and native-first derived fields instead of deleting domain-specific fields."
+  ],
+  "state": "running",
+  "resumeMode": "new",
+  "threadId": "019ce3da-e65d-7312-88aa-ba93b7d51fea",
+  "resumedFromThreadId": null,
+  "startedAt": "2026-03-12T21:01:44.020Z",
+  "updatedAt": "2026-03-12T21:03:55.034Z",
+  "completedAt": null,
+  "currentItemType": "command_execution",
+  "currentItemStatus": "completed",
+  "currentItemText": "/bin/bash -lc \"sed -n '1,220p' apps/forum-web/src/modules/agent-observer/types.ts > /dev/null\"",
+  "latestCommand": {
+    "command": "/bin/bash -lc \"sed -n '1,220p' apps/forum-web/src/modules/agent-observer/types.ts > /dev/null\"",
+    "status": "completed",
+    "exitCode": 0,
+    "updatedAt": "2026-03-12T21:03:55.033Z"
+  },
+  "latestFileChange": null,
+  "latestAgentMessage": null,
+  "latestReasoning": null,
+  "latestTodo": {
+    "text": [
+      "[ ] 在 bridge/API 层生成 native-first instance 观察视图、生命周期和调度 provenance 元数据",
+      "[ ] 更新 observer 前端类型与格式化方法，切换 Quick Preview 和 Monitoring 到 native-first 呈现",
+      "[ ] 运行最小相关检查并汇总风险"
+    ],
+    "updatedAt": "2026-03-12T21:03:52.514Z"
+  },
+  "latestEvent": "command completed: /bin/bash -lc \"sed -n '1,220p' apps/forum-web/src/modules/agent-observer/types.ts > /dev/null\"",
+  "lastError": null,
+  "usage": null,
+  "filesTouched": [],
+  "checksRun": [],
+  "openRisks": [],
+  "boundaryViolations": [],
+  "finalSummaryMarkdown": null
+}

@@ -1,0 +1,68 @@
+{
+  "summaryMarkdown": "监控页已补齐紧凑的 `Why This Reply` 视图，并扩展前端类型以兼容 `replyContext` / `replyContextTrace` / `latestReplyTrace` 及新增的生成来源字段。运营侧现在可直接看到回帖为何生成、读过哪些 thread/reply 上下文、命中的 memory，以及 `native draft` 与 `final reply` 的来源差异，从而判断最终文案是否已由 OpenClaw 原生生成主导。验证已完成：`bash scripts/check_errors.sh` 通过。",
+  "filesTouched": [
+    "apps/forum-web/src/modules/agent-observer/types.ts",
+    "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx"
+  ],
+  "checksRun": [
+    "npm run typecheck -w forum-web",
+    "npm run lint -w forum-web",
+    "npm run build -w forum-web",
+    "bash scripts/check_errors.sh",
+    "/bin/bash -lc \"pwd && printf '\\\\n--- AGENTS.md ---\\\\n' && sed -n '1,260p' AGENTS.md && printf '\\\\n--- service.mjs ---\\\\n' && sed -n '1,260p' apps/forum-api/src/modules/openclaw-orchestrator/service.mjs && printf '\\\\n--- format.ts ---\\\\n' && sed -n '1,260p' apps/forum-web/src/modules/agent-observer/format.ts && printf '\\\\n--- workflow.mjs ---\\\\n' && sed -n '1,260p' apps/forum-api/src/modules/openclaw-orchestrator/workflow.mjs && printf '\\\\n--- types.ts ---\\\\n' && sed -n '1,260p' apps/forum-web/src/modules/agent-observer/types.ts && printf '\\\\n--- monitoring-page.tsx ---\\\\n' && sed -n '1,320p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx && printf '\\\\n--- plan doc ---\\\\n' && sed -n '1,260p' docs/dev_plan/openclaw-multi-bot-forum-plan.md\"",
+    "/bin/bash -lc \"sed -n '1,260p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx\"",
+    "/bin/bash -lc 'rg -n \"buildReplyContent|reply context|finalReply|replyContent|persona|memory|why this reply|what it read\" apps/forum-api/src/modules/openclaw-orchestrator/service.mjs apps/forum-api/src/modules/openclaw-orchestrator/workflow.mjs apps/forum-web/src/modules/agent-observer -S'",
+    "/bin/bash -lc \"sed -n '260,520p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx\"",
+    "/bin/bash -lc \"sed -n '520,900p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx\"",
+    "/bin/bash -lc \"sed -n '950,1235p' apps/forum-api/src/modules/openclaw-orchestrator/service.mjs\"",
+    "/bin/bash -lc \"sed -n '200,340p' apps/forum-web/src/modules/agent-observer/types.ts\"",
+    "/bin/bash -lc 'rg -n \"replyTrace|replyContext|reply rationale|whyThisReply|finalReply|generatedReply|nativeReply\" apps/forum-api/src/modules/openclaw-orchestrator apps/forum-api/src/modules/agent-observer -S'",
+    "/bin/bash -lc \"rg -n \\\"ObserverDashboard|openclawBridge|orchestrator\\\" apps/forum-web/src/modules/agent-observer -g '\"'!components/monitoring-page.tsx'\"'\"",
+    "/bin/bash -lc \"sed -n '700,960p' apps/forum-api/src/modules/openclaw-orchestrator/service.mjs\"",
+    "/bin/bash -lc \"rg -n \\\"async function executeNativeReply|function executeNativeReply|executeNativeReply\\\\(\\\" apps/forum-api/src/modules/openclaw-orchestrator/service.mjs\"",
+    "/bin/bash -lc \"sed -n '560,760p' apps/forum-api/src/modules/openclaw-orchestrator/service.mjs\"",
+    "/bin/bash -lc 'rg -n \"buildNativeReplyPrompt|buildNativeObservePrompt\" apps/forum-api/src/modules/openclaw-orchestrator/service.mjs'",
+    "/bin/bash -lc \"sed -n '1,260p' scripts/openclaw/forum-native-turn.mjs\"",
+    "/bin/bash -lc \"sed -n '260,420p' scripts/openclaw/forum-native-turn.mjs\"",
+    "/bin/bash -lc \"sed -n '1,120p' AGENTS.md\"",
+    "/bin/bash -lc \"rg -n \\\"OpenClawInstanceStats|export type OpenClawInstance =\\\" apps/forum-web/src/modules/agent-observer/types.ts && sed -n '80,180p' apps/forum-web/src/modules/agent-observer/types.ts\"",
+    "/bin/bash -lc \"sed -n '180,220p' apps/forum-web/src/modules/agent-observer/types.ts\"",
+    "/bin/bash -lc 'rg -n \"replyContext|OpenClawReplyContextTrace|OpenClawReplyContextHighlight\" apps/forum-web/src -S'",
+    "/bin/bash -lc \"sed -n '132,170p' apps/forum-web/src/modules/agent-observer/types.ts\"",
+    "/bin/bash -lc \"sed -n '1,120p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx && printf '\\\\n--- mid ---\\\\n' && sed -n '330,430p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx\"",
+    "/bin/bash -lc \"sed -n '430,520p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx\"",
+    "/bin/bash -lc \"sed -n '388,520p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx\"",
+    "/bin/bash -lc \"sed -n '520,620p' apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx\"",
+    "/bin/bash -lc 'cat package.json'",
+    "/bin/bash -lc 'bash scripts/check_errors.sh'",
+    "/bin/bash -lc \"nl -ba apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx | sed -n '200,220p'\"",
+    "/bin/bash -lc 'rg -n \"selectedReplyTrace|replyTrace\" apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx'",
+    "/bin/bash -lc 'npm run typecheck -w forum-web'",
+    "/bin/bash -lc 'npm run lint -w forum-web'",
+    "/bin/bash -lc 'npm run build -w forum-web'",
+    "/bin/bash -lc 'git diff -- apps/forum-web/src/modules/agent-observer/types.ts apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx'",
+    "/bin/bash -lc 'git status --short apps/forum-web/src/modules/agent-observer/types.ts apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx'"
+  ],
+  "openRisks": [
+    "后端 reply trace payload 仍在并行演进；前端已做别名兼容，但若最终字段结构继续变化仍需再对齐。",
+    "本子任务受 owned-path 限制，未补 `docs/dev_logs/...`；若主代理要求满足仓库级追踪规范，需要在上层线程补齐。",
+    "若后端暂时未回传结构化 reply trace，页面会显示空状态提示，待 native reply trace 数据落地后才会完整展示。"
+  ],
+  "name": "frontend-context-visibility",
+  "mission": "Extend monitoring UI/types so operators can inspect what context a claw read before replying and why the final reply looks the way it does.",
+  "ownedPaths": [
+    "apps/forum-web/src/modules/agent-observer/types.ts",
+    "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx"
+  ],
+  "readFiles": [
+    "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+    "apps/forum-web/src/modules/agent-observer/format.ts"
+  ],
+  "extraInstructions": [
+    "Do not edit backend files.",
+    "Keep the UI compact and readable; avoid bloating the page."
+  ],
+  "boundaryViolations": [],
+  "threadId": "019ce403-730f-73c2-8415-e72249772426",
+  "resumedFromThreadId": null
+}

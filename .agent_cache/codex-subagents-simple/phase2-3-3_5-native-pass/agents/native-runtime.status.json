@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "name": "native-runtime",
+  "mission": "Tighten the Phase 3 backend lifecycle contract. Improve the orchestrator and native runner so native session/runtime metadata is more explicit, native scheduling mode is visible, and forum-side scheduling is clearly treated as a compatibility layer driving native turns rather than an opaque black box.",
+  "ownedPaths": [
+    "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+    "apps/forum-api/src/modules/openclaw-orchestrator/native-runner.mjs"
+  ],
+  "readFiles": [
+    "apps/forum-api/src/modules/openclaw-bridge/service.mjs",
+    "apps/forum-api/src/modules/openclaw-orchestrator/store.mjs",
+    "apps/forum-api/src/modules/agent-observer/routes.mjs"
+  ],
+  "extraInstructions": [
+    "Prefer additive metadata and clearer lifecycle signals over risky architectural rewrites.",
+    "Keep OpenClaw turns bound to the intended local runtime/workspace and make that obvious in code or metadata.",
+    "Do not modify frontend files in this subtask."
+  ],
+  "state": "running",
+  "resumeMode": "new",
+  "threadId": "019ce3da-e6c4-7ee2-8397-7f3db61104a2",
+  "resumedFromThreadId": null,
+  "startedAt": "2026-03-12T21:01:44.152Z",
+  "updatedAt": "2026-03-12T21:04:11.566Z",
+  "completedAt": null,
+  "currentItemType": "file_change",
+  "currentItemStatus": "completed",
+  "currentItemText": "update:/home/wudizhe001/Documents/GitHub/agents-forum/apps/forum-api/src/modules/openclaw-orchestrator/native-runner.mjs",
+  "latestCommand": {
+    "command": "/bin/bash -lc \"sed -n '1,220p' apps/forum-api/src/modules/openclaw-orchestrator/service.mjs\"",
+    "status": "completed",
+    "exitCode": 0,
+    "updatedAt": "2026-03-12T21:03:57.619Z"
+  },
+  "latestFileChange": {
+    "paths": [
+      "/home/wudizhe001/Documents/GitHub/agents-forum/apps/forum-api/src/modules/openclaw-orchestrator/native-runner.mjs"
+    ],
+    "status": "completed",
+    "updatedAt": "2026-03-12T21:04:11.565Z"
+  },
+  "latestAgentMessage": null,
+  "latestReasoning": null,
+  "latestTodo": {
+    "text": [
+      "[x] Inspect current orchestrator/native-runner flow and identify additive metadata points for native lifecycle, scheduling ...",
+      "[ ] Implement backend changes in owned files to expose explicit native runtime metadata, compatibility-layer scheduling sig...",
+      "[ ] Run targeted verification, review diff for owned files, and summarize residual risks"
+    ],
+    "updatedAt": "2026-03-12T21:02:59.538Z"
+  },
+  "latestEvent": "file change completed: /home/wudizhe001/Documents/GitHub/agents-forum/apps/forum-api/src/modules/openclaw-orchestrator/native-runner.mjs",
+  "lastError": null,
+  "usage": null,
+  "filesTouched": [],
+  "checksRun": [],
+  "openRisks": [],
+  "boundaryViolations": [],
+  "finalSummaryMarkdown": null
+}

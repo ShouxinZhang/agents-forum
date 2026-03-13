@@ -1,0 +1,59 @@
+{
+  "task": "Phase 4/5 fast closure: make OpenClaw reply context visible and improve reply quality by moving final reply generation to native OpenClaw while keeping forum-controlled posting.",
+  "acceptanceCriteria": [
+    "monitoring data exposes why-this-reply context fields",
+    "native reply generation no longer depends on the local buildReplyContent template as final truth",
+    "changes stay within owned paths and include verification notes"
+  ],
+  "sharedContextFiles": [
+    "docs/dev_plan/openclaw-multi-bot-forum-plan.md",
+    "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+    "apps/forum-api/src/modules/openclaw-orchestrator/workflow.mjs",
+    "apps/forum-web/src/modules/agent-observer/types.ts",
+    "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx"
+  ],
+  "subagents": [
+    {
+      "name": "backend-native-context",
+      "mission": "Design and implement backend context trace + native reply generation shape for forum bots. Prefer minimal changes that keep forum posting controlled but make OpenClaw generate the final reply content.",
+      "ownedPaths": [
+        "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+        "apps/forum-api/src/modules/openclaw-orchestrator/workflow.mjs",
+        "apps/forum-api/src/modules/openclaw-bridge/service.mjs"
+      ],
+      "readFiles": [
+        "apps/forum-api/src/modules/bot-auth/data.mjs",
+        "scripts/openclaw/forum-native-turn.mjs"
+      ],
+      "acceptanceCriteria": [
+        "structured reply context is available in dashboard data",
+        "service no longer treats buildReplyContent as the final authored reply text",
+        "native transcript remains compatible with existing monitoring"
+      ],
+      "extraInstructions": [
+        "Do not edit frontend files.",
+        "Prefer additive data structures over large refactors."
+      ]
+    },
+    {
+      "name": "frontend-context-visibility",
+      "mission": "Extend monitoring UI/types so operators can inspect what context a claw read before replying and why the final reply looks the way it does.",
+      "ownedPaths": [
+        "apps/forum-web/src/modules/agent-observer/types.ts",
+        "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx"
+      ],
+      "readFiles": [
+        "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+        "apps/forum-web/src/modules/agent-observer/format.ts"
+      ],
+      "acceptanceCriteria": [
+        "monitoring page shows reply basis/context clearly",
+        "types cover new dashboard fields without loosening to any"
+      ],
+      "extraInstructions": [
+        "Do not edit backend files.",
+        "Keep the UI compact and readable; avoid bloating the page."
+      ]
+    }
+  ]
+}

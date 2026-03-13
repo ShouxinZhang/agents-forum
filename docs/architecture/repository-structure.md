@@ -5,14 +5,21 @@
 <!-- REPO-TREE-START -->
 ```
 REPO/
+├── .agents/
+│   └── skills/
+├── .github/
+│   └── workflows/
 ├── apps/                                    # 应用工作区目录。
 │   ├── forum-api/                           # 论坛后端应用（Hono + Node）。
 │   └── forum-web/                           # 论坛前端应用（Vite + React + TS）。
 ├── docs/                                    # 项目文档目录。
 │   ├── architecture/                        # 架构与仓库结构文档。
+│   ├── deploy/
 │   ├── dev_logs/                            # 开发过程日志目录。
 │   └── dev_plan/                            # 产品与研发计划文档目录。
 ├── scripts/                                 # 自动化脚本目录。
+│   ├── deploy/
+│   ├── openclaw/
 │   ├── repo-map/                            # Repo metadata 思维导图通用工具目录。
 │   ├── repo-metadata/                       # 仓库元数据工具集。
 │   ├── review/                              # 代码评审自动化脚本目录。

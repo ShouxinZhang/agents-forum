@@ -168,6 +168,82 @@ function extractMessageText(content) {
   );
 }
 
+function extractRawMessageText(content) {
+  if (!Array.isArray(content)) {
+    return "";
+  }
+
+  return content
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") {
+        return "";
+      }
+
+      if (typeof entry.text === "string") {
+        return entry.text;
+      }
+
+      if (typeof entry.thinking === "string") {
+        return entry.thinking;
+      }
+
+      return "";
+    })
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+}
+
+function parseNativeReplyDraft(rawText) {
+  if (typeof rawText !== "string" || !rawText.trim()) {
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(rawText);
+    if (!payload || typeof payload !== "object") {
+      return null;
+    }
+
+    const contextTrace =
+      payload.contextTrace && typeof payload.contextTrace === "object" ? payload.contextTrace : {};
+    const finalReply =
+      typeof payload.replyText === "string"
+        ? payload.replyText.trim()
+        : typeof contextTrace.finalReply === "string"
+          ? contextTrace.finalReply.trim()
+          : typeof payload.content === "string"
+            ? payload.content.trim()
+            : "";
+
+    if (!finalReply && !contextTrace.whyThisReply && !payload.whyThisReply) {
+      return null;
+    }
+
+    const basis = Array.isArray(contextTrace.basis)
+      ? contextTrace.basis
+      : Array.isArray(payload.basis)
+        ? payload.basis
+        : [];
+
+    return {
+      finalReply: clipText(finalReply, 240),
+      whyThisReply: clipText(payload.whyThisReply || contextTrace.whyThisReply || "", 160),
+      memoryApplied: clipText(payload.memoryApplied || contextTrace.memoryApplied || "", 160),
+      persona: clipText(contextTrace.persona || "", 120),
+      threadId: typeof contextTrace.threadId === "string" ? contextTrace.threadId : "",
+      threadTitle: typeof contextTrace.threadTitle === "string" ? contextTrace.threadTitle : "",
+      basis: basis.map((entry) => clipText(entry, 120)).filter(Boolean).slice(0, 4),
+      source:
+        typeof contextTrace.source === "string" && contextTrace.source
+          ? contextTrace.source
+          : "openclaw-native",
+    };
+  } catch {
+    return null;
+  }
+}
+
 function summarizeTranscriptEntry(entry) {
   if (!entry || typeof entry !== "object") {
     return null;
@@ -196,6 +272,7 @@ function summarizeTranscriptEntry(entry) {
     const message = entry.message || {};
     const role = typeof message.role === "string" ? message.role : "";
     const body = extractMessageText(message.content);
+    const rawBody = extractRawMessageText(message.content);
 
     if (role === "user") {
       return {
@@ -208,6 +285,18 @@ function summarizeTranscriptEntry(entry) {
     }
 
     if (role === "assistant") {
+      const replyDraft = parseNativeReplyDraft(rawBody);
+      if (replyDraft) {
+        return {
+          id,
+          type: "assistant",
+          label: "原生回复草稿",
+          summary: replyDraft.whyThisReply || replyDraft.finalReply || "已生成原生回复草稿",
+          timestamp,
+          replyContext: replyDraft,
+        };
+      }
+
       return {
         id,
         type: "assistant",
@@ -272,6 +361,8 @@ function discoverNativeAgent(home, agentEntry) {
     .filter(Boolean)
     .slice(-8)
     .reverse();
+  const latestReplyContext =
+    recentEvents.find((event) => event?.replyContext)?.replyContext || null;
   const updatedAt = latestSession?.updatedAt
     ? toIsoFromUnix(latestSession.updatedAt)
     : recentEvents[0]?.timestamp || "";
@@ -295,6 +386,9 @@ function discoverNativeAgent(home, agentEntry) {
     currentAction: recentEvents[0]?.label || "暂无原生 activity",
     currentSummary: recentEvents[0]?.summary || "",
     recentEvents,
+    latestReplyContext,
+    whyThisReply: latestReplyContext?.whyThisReply || "",
+    finalReply: latestReplyContext?.finalReply || "",
     memoryDocs,
     skills:
       latestSession?.skillsSnapshot?.skills
@@ -347,9 +441,11 @@ function normalizeHomeEntry({ id, label, homePath, linkedInstanceId = "", source
 
 function buildHomeEntries(orchestratorDashboard) {
   const homes = [];
-  const globalHomePath = process.env.OPENCLAW_HOME
-    ? path.resolve(process.env.OPENCLAW_HOME)
-    : path.join(os.homedir(), ".openclaw");
+  const configuredStateDir = process.env.OPENCLAW_STATE_DIR?.trim();
+  const configuredHomeRoot = process.env.OPENCLAW_HOME?.trim();
+  const globalHomePath = configuredStateDir
+    ? path.resolve(configuredStateDir)
+    : path.join(path.resolve(configuredHomeRoot || os.homedir()), ".openclaw");
 
   homes.push(
     normalizeHomeEntry({
@@ -380,10 +476,91 @@ function buildHomeEntries(orchestratorDashboard) {
   return homes;
 }
 
+function chooseLatestAgent(left, right) {
+  if (!left) {
+    return right;
+  }
+  if (!right) {
+    return left;
+  }
+
+  return (right.updatedAt || "").localeCompare(left.updatedAt || "") > 0 ? right : left;
+}
+
+function resolvePresenceSource(nativeValue, forumValue) {
+  if (nativeValue && forumValue) {
+    return "mixed";
+  }
+  if (nativeValue) {
+    return "native";
+  }
+  if (forumValue) {
+    return "forum";
+  }
+  return "none";
+}
+
+function buildInstanceViews(homes, agents, orchestratorDashboard) {
+  const instances = orchestratorDashboard?.instances ?? [];
+  const homesByInstanceId = new Map();
+  const agentsByInstanceId = new Map();
+
+  for (const home of homes) {
+    if (home.linkedInstanceId) {
+      homesByInstanceId.set(home.linkedInstanceId, home);
+    }
+  }
+
+  for (const agent of agents) {
+    if (!agent.linkedInstanceId) {
+      continue;
+    }
+    agentsByInstanceId.set(
+      agent.linkedInstanceId,
+      chooseLatestAgent(agentsByInstanceId.get(agent.linkedInstanceId), agent)
+    );
+  }
+
+  return instances.map((instance) => {
+    const home = homesByInstanceId.get(instance.id) || null;
+    const agent = agentsByInstanceId.get(instance.id) || null;
+    const latestReplyContext = agent?.latestReplyContext || instance.replyContext || null;
+    const nativeOnline =
+      Boolean(agent?.online) ||
+      Boolean(home?.connected && isRecent(home.latestUpdatedAt)) ||
+      instance.nativeStatus === "running";
+    const schedulerOnline = Boolean(instance.schedulerOnline);
+    const observedOnline = nativeOnline || schedulerOnline;
+    const nativeActive =
+      instance.nativeStatus === "running" ||
+      Boolean(agent?.currentAction && agent.currentAction !== "暂无原生 activity" && agent.online);
+    const forumActive = Boolean(instance.observedActive);
+
+    return {
+      instanceId: instance.id,
+      homeId: home?.id || "",
+      agentId: agent?.id || "",
+      observedOnline,
+      observedActive: nativeActive || forumActive,
+      onlineSource: resolvePresenceSource(nativeOnline, schedulerOnline),
+      activitySource: resolvePresenceSource(nativeActive, forumActive),
+      primaryTimelineSource: agent?.recentEvents?.length ? "native" : instance.recentEvents?.length ? "forum" : "none",
+      latestSessionId: agent?.latestSessionId || instance.nativeSessionId || "",
+      nativeUpdatedAt: agent?.updatedAt || home?.latestUpdatedAt || instance.nativeHeartbeatAt || "",
+      currentAction: agent?.currentAction || instance.workflow?.currentAction || "",
+      currentSummary: agent?.currentSummary || instance.lastSummary || "",
+      latestReplyContext,
+      whyThisReply: latestReplyContext?.whyThisReply || "",
+      finalReply: latestReplyContext?.finalReply || "",
+    };
+  });
+}
+
 function createBridgeService() {
   function getDashboard(orchestratorDashboard) {
     const homes = buildHomeEntries(orchestratorDashboard);
     const agents = homes.flatMap((home) => home.agents);
+    const instanceViews = buildInstanceViews(homes, agents, orchestratorDashboard);
     const summary = {
       homes: homes.length,
       connectedHomes: homes.filter((home) => home.connected).length,
@@ -427,6 +604,7 @@ function createBridgeService() {
         memoryDocs: home.memoryDocs,
       })),
       agents,
+      instanceViews,
       notes,
     };
   }

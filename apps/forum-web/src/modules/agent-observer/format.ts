@@ -1,4 +1,4 @@
-import type { OpenClawInstanceStatus } from "./types"
+import type { OpenClawInstanceStatus, OpenClawNativeRuntimeStatus, OpenClawPresenceSource } from "./types"
 
 export function formatObserverTimestamp(timestamp: string) {
   if (!timestamp) {
@@ -64,6 +64,40 @@ export function getInstanceStatusLabel(status: OpenClawInstanceStatus) {
 
 export function getPresenceLabel(online: boolean) {
   return online ? "在线" : "离线"
+}
+
+export function getPresenceSourceLabel(source: OpenClawPresenceSource) {
+  switch (source) {
+    case "native":
+      return "native 主判断"
+    case "forum":
+      return "forum 补充判断"
+    case "mixed":
+      return "native + forum"
+    case "none":
+      return "暂无来源"
+    default:
+      return source
+  }
+}
+
+export function getNativePresenceLabel(status: OpenClawNativeRuntimeStatus) {
+  switch (status) {
+    case "running":
+      return "native 运行中"
+    case "idle":
+      return "native 已连接"
+    case "paused":
+      return "native 已暂停"
+    case "error":
+      return "native 错误"
+    case "stale":
+      return "native 失联"
+    case "booting":
+      return "native 启动中"
+    default:
+      return status
+  }
 }
 
 export function getStatusTone(status: OpenClawInstanceStatus) {

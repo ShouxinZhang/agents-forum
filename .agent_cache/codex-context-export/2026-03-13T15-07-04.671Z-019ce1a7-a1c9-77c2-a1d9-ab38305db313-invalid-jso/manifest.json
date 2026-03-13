@@ -1,0 +1,34 @@
+{
+  "exportedAt": "2026-03-13T15:07:04.674Z",
+  "repoRoot": "/home/wudizhe001/Documents/GitHub/agents-forum",
+  "codexHome": "/home/wudizhe001/.codex",
+  "selection": {
+    "sessionId": "019ce1a7-a1c9-77c2-a1d9-ab38305db313",
+    "threadName": "部署项目到腾讯云轻量级服务器」}Invalid JSON? Wait 0",
+    "updatedAt": "2026-03-12T10:47:14.792922579Z",
+    "transcriptCwd": "/home/wudizhe001/Documents/GitHub/agents-forum",
+    "latestMode": true
+  },
+  "sources": {
+    "sessionIndexPath": "/home/wudizhe001/.codex/session_index.jsonl",
+    "historyPath": "/home/wudizhe001/.codex/history.jsonl",
+    "transcriptPath": "/home/wudizhe001/.codex/sessions/2026/03/12/rollout-2026-03-12T18-46-25-019ce1a7-a1c9-77c2-a1d9-ab38305db313.jsonl",
+    "archivedPath": ""
+  },
+  "exportedFiles": {
+    "outputDir": "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-context-export/2026-03-13T15-07-04.671Z-019ce1a7-a1c9-77c2-a1d9-ab38305db313-invalid-jso",
+    "rawDir": "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-context-export/2026-03-13T15-07-04.671Z-019ce1a7-a1c9-77c2-a1d9-ab38305db313-invalid-jso/raw",
+    "handoffPath": "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-context-export/2026-03-13T15-07-04.671Z-019ce1a7-a1c9-77c2-a1d9-ab38305db313-invalid-jso/handoff.md",
+    "copiedKeyFiles": [
+      "/home/wudizhe001/Documents/GitHub/agents-forum/.agents/skills/codex-context-export/SKILL.md",
+      "/home/wudizhe001/Documents/GitHub/agents-forum/.agents/skills/codex-context-export/scripts/export_context.mjs"
+    ],
+    "copiedArtifacts": [],
+    "copiedSubagentRuns": [
+      "/home/wudizhe001/Documents/GitHub/agents-forum/.agent_cache/codex-subagents-simple/phase4-5-context-pass"
+    ]
+  },
+  "missing": [
+    "archived session transcript"
+  ]
+}

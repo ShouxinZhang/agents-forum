@@ -1,0 +1,84 @@
+{
+  "task": "Accelerate Agents Forum roadmap Phases 2, 3, and 3.5 using isolated Codex subagents",
+  "acceptanceCriteria": [
+    "Phase 2 moves monitoring toward native-first semantics in dashboard data or UI",
+    "Phase 3 improves native runtime lifecycle visibility or control without regressing the working post/reply chain",
+    "Phase 3.5 adds a YOLO mode implementation path with explicit duration, status, and recovery handling",
+    "Each subagent returns changed files, checks run, and remaining risks"
+  ],
+  "sharedContextFiles": [
+    "AGENTS.md",
+    "docs/dev_plan/openclaw-multi-bot-forum-plan.md",
+    "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+    "apps/forum-api/src/modules/openclaw-bridge/service.mjs",
+    "apps/forum-api/src/modules/agent-observer/routes.mjs",
+    "apps/forum-api/src/modules/mcp/forum-bot/policy.mjs",
+    "apps/forum-web/src/modules/agent-observer/types.ts"
+  ],
+  "subagents": [
+    {
+      "name": "phase2-native-monitoring",
+      "mission": "Advance Phase 2 by making observer data and UI more clearly native-first. Add native presence/heartbeat semantics, reduce forum-scheduler confusion, and expose enough bridge metadata for quick preview and monitoring page to treat native runtime as the primary signal where possible.",
+      "ownedPaths": [
+        "apps/forum-api/src/modules/openclaw-bridge/service.mjs",
+        "apps/forum-web/src/modules/agent-observer/types.ts",
+        "apps/forum-web/src/modules/agent-observer/format.ts",
+        "apps/forum-web/src/modules/agent-observer/components/quick-preview-sidebar.tsx",
+        "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx"
+      ],
+      "readFiles": [
+        "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+        "apps/forum-api/src/modules/agent-observer/routes.mjs",
+        "docs/dev_plan/openclaw-multi-bot-forum-plan.md"
+      ],
+      "extraInstructions": [
+        "Do not edit backend routes or orchestrator files; shape your bridge output so primary can wire it if needed.",
+        "Keep labels business-readable in Chinese where the UI already uses Chinese.",
+        "Prefer additive schema changes over breaking removals."
+      ]
+    },
+    {
+      "name": "phase3-native-runtime",
+      "mission": "Advance Phase 3 by improving native runtime lifecycle semantics in the forum orchestrator. Add explicit native heartbeat/status fields and actions so the dashboard can reason about native runtime health and control flow, while preserving the existing working integrated reply chain.",
+      "ownedPaths": [
+        "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+        "apps/forum-api/src/modules/openclaw-orchestrator/store.mjs",
+        "apps/forum-api/src/modules/openclaw-orchestrator/native-runner.mjs",
+        "apps/forum-api/src/modules/agent-observer/routes.mjs"
+      ],
+      "readFiles": [
+        "apps/forum-api/src/modules/openclaw-bridge/service.mjs",
+        "apps/forum-api/src/modules/mcp/forum-bot/policy.mjs",
+        "apps/forum-web/src/modules/agent-observer/types.ts",
+        "scripts/openclaw/runtime-gate.mjs"
+      ],
+      "extraInstructions": [
+        "Do not touch frontend files.",
+        "Preserve current run_once/pause/resume behavior while adding clearer native lifecycle fields or controls.",
+        "If you add dashboard fields, keep them backward-compatible."
+      ]
+    },
+    {
+      "name": "phase35-yolo-mode",
+      "mission": "Implement the first working slice of YOLO Mode. Add backend state, policy bypass, observer actions, and frontend controls/status for a time-limited high-activity mode that bypasses quota, cooldown, and content safety checks for writable Claws while keeping claw-mod read-only.",
+      "ownedPaths": [
+        "apps/forum-api/src/modules/mcp/forum-bot/policy.mjs",
+        "apps/forum-api/src/modules/agent-observer/routes.mjs",
+        "apps/forum-web/src/modules/agent-observer/api.ts",
+        "apps/forum-web/src/modules/agent-observer/types.ts",
+        "apps/forum-web/src/modules/agent-observer/components/monitoring-page.tsx",
+        "apps/forum-web/src/modules/agent-observer/components/quick-preview-sidebar.tsx"
+      ],
+      "readFiles": [
+        "apps/forum-api/src/modules/openclaw-orchestrator/service.mjs",
+        "apps/forum-api/src/modules/openclaw-orchestrator/store.mjs",
+        "docs/dev_plan/openclaw-multi-bot-forum-plan.md"
+      ],
+      "extraInstructions": [
+        "You may need to coordinate implicitly with the runtime subagent by keeping your changes additive and tolerant of missing fields.",
+        "Show explicit risk signage in the UI when YOLO mode is enabled.",
+        "Keep claw-mod read-only even during YOLO mode."
+      ]
+    }
+  ]
+}
